@@ -4,7 +4,7 @@ class OverviewGraph {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data, _locations) {
+    constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: 1200,
@@ -13,7 +13,6 @@ class OverviewGraph {
             tooltipPadding: _config.tooltipPadding || 15
         }
         this.data = _data;
-        this.locations = _locations;
         this.initVis();
     }
 
@@ -56,14 +55,13 @@ class OverviewGraph {
 
         let slider = d3
             .sliderHorizontal()
-            .min(1995)
-            .max(2017)
-            .step(1)
+            .domain([new Date(1995, 0, 1), new Date(2017, 0, 1)])
+            .tickFormat(d3.timeFormat("%Y"))
             .ticks(23)
             .width(vis.config.width)
             .displayValue(true)
             .on('onchange', (val) => {
-                dispatcher.call('updateTime',{}, val)
+                dispatcher.call('updateTime',{}, val.getFullYear())
             });
 
         d3.select('#slider')
@@ -101,11 +99,23 @@ class OverviewGraph {
             .data(vis.data.link, d => [d.source, d.target])
             .join('line')
             .attr('class', d => `link link-${d.source.id} link-${d.target.id}`)
+            .attr('stroke-width', 2)
             .on('mouseover',(event, d) => {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', true);
+                d3.select('#tooltip')
+                    .style('display', 'block')
+                    .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
+                    .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+                    .html(`
+                      <div class="tooltip-title">${d.target.id} - ${d.source.id}</div>
+                      <ul>
+                        <li>Overall Trading Amount: ${d.import_value}</li>
+                      </ul>
+                    `);
             })
             .on('mouseleave',(event, d) => {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', false);
+                d3.select('#tooltip').style('display', 'none');
             });
 
         vis.patterns.selectAll('pattern').data(vis.data.node).join('pattern')
@@ -148,6 +158,11 @@ class OverviewGraph {
             .on('mouseleave', (event, d) => {
                 d3.selectAll('.link-'+d.id).classed('hover', false);
                 d3.select('#tooltip').style('display', 'none');
+            })
+            .on('click', function (event, d) {
+                const isHighlighted = d3.select(this).classed('highlight');
+                d3.selectAll('.link-'+d.id).classed('highlight', !isHighlighted);
+                d3.select(this).classed('highlight', !isHighlighted);
             });
         // Update positions
         vis.simulation.on('tick', () => {

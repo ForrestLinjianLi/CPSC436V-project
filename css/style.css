@@ -28,12 +28,12 @@ line {
     position: relative;
 }
 
-.link:hover,.link.hover {
+.link:hover,.link.hover,.link.highlight {
     stroke-width: 2;
     stroke: black;
 }
 
-.node:hover,.node.hover {
+.node:hover,.node.hover,.node.highlight {
     stroke-width: 4;
 }
 
