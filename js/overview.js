@@ -29,11 +29,11 @@ class OverviewGraph {
 
         // Initialize scales
         vis.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-        vis.xScale = d3.scaleLinear()
-            .domain([1, 40])
-            .range([20, 80]);
-        vis.yScale = d3.scaleLinear()
-            .range([vis.config.height, 0])
+        vis.lengthScale = d3.scaleLinear()
+            .range([20, 100]);
+        vis.radiusScale = d3.scaleLinear()
+            .domain([40, 100])
+            .range([80, 60])
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
@@ -45,13 +45,36 @@ class OverviewGraph {
         vis.chart = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
 
+        vis.links = vis.chart.append('g');
+        vis.nodes = vis.chart.append('g');
+
         // Initialize force simulation
         vis.simulation = d3.forceSimulation()
             .force('link', d3.forceLink().id(d => d.id))
-            .force('charge', d3.forceManyBody().strength(-20))
-            .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
-            .force('collide',d3.forceCollide().radius(35).iterations(2));
+            .force('charge', d3.forceManyBody().strength(-40))
+            .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2));
 
+        let slider = d3
+            .sliderHorizontal()
+            .min(1995)
+            .max(2017)
+            .step(1)
+            .ticks(23)
+            .width(vis.config.width)
+            .displayValue(true)
+            .on('onchange', (val) => {
+                dispatcher.call('updateTime',{}, val)
+            });
+
+        d3.select('#slider')
+            .append('svg')
+            .attr('width', vis.config.width + 100)
+            .attr('height', 100)
+            .append('g')
+            .attr('transform', 'translate(30,30)')
+            .call(slider);
+
+        vis.patterns = vis.chart.append('defs');
         vis.updateVis();
     }
 
@@ -60,10 +83,11 @@ class OverviewGraph {
      */
     updateVis() {
         let vis = this;
+        vis.lengthScale.domain([1, d3.max(vis.data.node, d=>d.partner_num)]);
         // Add node-link data to simulation
         vis.simulation.nodes(vis.data.node);
-        vis.simulation.force('link').links(vis.data.link).distance(d => 200);
-        vis.simulation.force('collide',d3.forceCollide().radius(60).iterations(2));
+        vis.simulation.force('link').links(vis.data.link).distance(100);
+        vis.simulation.force('collide',d3.forceCollide().radius(vis.radiusScale(vis.data.node.length)).iterations(2));
         vis.renderVis();
     }
 
@@ -73,7 +97,7 @@ class OverviewGraph {
     renderVis() {
         let vis = this;
         // Add links
-        const links = vis.chart.selectAll('line')
+        const links = vis.links.selectAll('line')
             .data(vis.data.link, d => [d.source, d.target])
             .join('line')
             .attr('class', d => `link link-${d.source.id} link-${d.target.id}`)
@@ -84,33 +108,29 @@ class OverviewGraph {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', false);
             });
 
-        let patterns = vis.chart.append('defs');
+        vis.patterns.selectAll('pattern').data(vis.data.node).join('pattern')
+            .attr('id', d => d.id+"-icon")
+            .attr('width', "100%")
+            .attr('height', "100%")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("patternUnits", "objectBoundingBox")
+            .append("image")
+            .attr("href", d=>`image/flags/1x1/${d.id.toLowerCase()}.svg`)
+            .attr("height", d=>vis.lengthScale(d.partner_num))
+            .attr("width", d=>vis.lengthScale(d.partner_num))
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("preserveAspectRatio", "xMidYMid slice");
 
-        vis.data.node.forEach(d => {
-            patterns.append('pattern')
-                .attr('id', d.id+"-icon")
-                .attr('width', "100%")
-                .attr('height', "100%")
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("patternUnits", "objectBoundingBox")
-                .append("image")
-                .attr("href", `image/flags/1x1/${d.id.toLowerCase()}.svg`)
-                .attr("height", vis.xScale(d.partner_num))
-                .attr("width", vis.xScale(d.partner_num))
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("preserveAspectRatio", "xMidYMid slice");
-            // Add nodes
-        })
-        const nodes = vis.chart.selectAll('.node').data(vis.data.node, d=> d.id)
+        const nodes = vis.nodes.selectAll('.node').data(vis.data.node, d=> d.id)
             .join('rect')
             .attr('class', `node`)
             .attr('id', d => `node-${d.id}`)
             .attr("fill", d => `url(#${d.id}-icon)`)
             .attr('stroke', 'black')
-            .attr('width', d => vis.xScale(d.partner_num))
-            .attr('height', d=> vis.xScale(d.partner_num))
+            .attr('width', d => vis.lengthScale(d.partner_num))
+            .attr('height', d=> vis.lengthScale(d.partner_num))
             .call(drag(vis.simulation))
             .on('mouseover', (event, d) => {
                 d3.selectAll('.link-'+d.id).classed('hover', true);

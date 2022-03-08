@@ -17,9 +17,15 @@ h1 {
     color: #888;
 }
 
+.node {
+    z-index: 1;
+    position: relative;
+}
 
 line {
     stroke: #ddd;
+    z-index: -1;
+    position: relative;
 }
 
 .link:hover,.link.hover {
