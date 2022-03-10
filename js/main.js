@@ -1,10 +1,20 @@
 /**
  * Load data from CSV file asynchronously and render charts
  */
+// Filters 
+let countries, timeline, export_import, mode;
 
+//
 let primaryPartners, locations, filteredData, selectedTime = 1995;
-let overview, treemap, stackedLineChart, geographicMap, compareGraph;
+let overview, treemap, stackedLineChart, geomap, compareGraph;
 const dispatcher = d3.dispatch('updateTime');
+
+
+// Filters
+countries = [];
+timeline = [selectedTime, selectedTime];
+export_import = 'export'; // export/ import
+mode = 'overview'; // overview/ exploration
 
 d3.json('data/rollup_force_data.json').then(_data => {
   primaryPartners = _data;
@@ -55,7 +65,7 @@ d3.json('data/rollup_force_data.json').then(_data => {
     }
   });
 
-  const choroplethMap = new ChoroplethMap({ 
+  const geomap = new ChoroplethMap({ 
     parentElement: '#geomap'
   },  worldGeoData);
 })
@@ -70,5 +80,5 @@ dispatcher.on('updateTime', s => {
 
 
 function filterDataByTime() {
-  filteredData = d3.filter(data, d => d.year >= selectedTimeInterval[0] && d.year <= selectedTimeInterval[1]);
+  filteredData = d3.filter(data, d => d.year >= timeline[0] && d.year <= timeline[1]);
 }
