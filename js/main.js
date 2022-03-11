@@ -4,11 +4,12 @@
 // Filters 
 let countries, timeline, export_import, mode;
 
-//
-let primaryPartners, locations, filteredData, selectedTime = 1995;
-let overview, treemap, stackedLineChart, geomap, compareGraph;
-const dispatcher = d3.dispatch('updateTime');
+// Figures
+let primaryPartners, filteredData, selectedTime = 1995;
+let overview, treemap, stackedLineChart, geomap, scatterplot;
 
+// Dispatcher
+const dispatcher = d3.dispatch('updateTime');
 
 // Filters
 countries = [];

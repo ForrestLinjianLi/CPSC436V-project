@@ -22,9 +22,9 @@
     display: flex;
 }
 
-#out{
+/* #out{
     background: #ddd;
-}
+} */
 #left {
     float:left;
 }

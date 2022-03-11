@@ -5,10 +5,10 @@ class ChoroplethMap {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data) {
+    constructor(_config, _data, _mode) {
       this.config = {
         parentElement: _config.parentElement,
-        containerWidth: _config.containerWidth || 600,
+        containerWidth: _config.containerWidth || 800,
         containerHeight: _config.containerHeight || 500,
         margin: _config.margin || {top: 0, right: 0, bottom: 0, left: 0},
         tooltipPadding: 10,
@@ -18,6 +18,7 @@ class ChoroplethMap {
         legendRectWidth: 150
       }
       this.data = _data;
+      this.mode = _mode || "overview";
       this.initVis();
     }
     
@@ -55,8 +56,9 @@ class ChoroplethMap {
           .attr("id", "legend-gradient");
   
       // Append legend
-      vis.legend = vis.chart.append('g')
+      vis.legend = vis.svg.append('g')
           .attr('class', 'legend')
+          //.attr('transform', `translate(${vis.width - vis.config.legendLeft- 100},${ vis.config.legendBottom})`);
           .attr('transform', `translate(${vis.config.legendLeft},${vis.height - vis.config.legendBottom})`);
       
       vis.legendRect = vis.legend.append('rect')
