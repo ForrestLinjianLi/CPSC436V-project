@@ -13,18 +13,43 @@
 }
 
 /* container */
+#header-row-container {
+    display: flex;
+    width: 100%;
+}
+
 .container {
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.row-container {
+    position: relative;
+    margin: 10px;
+    align-content: start;
+    display: inline-flex;
+    left:10px;
+}
+
+#filter-container {
     display: flex;
     flex-direction: column;
     margin: 20px;
-}
-.row-container {
-    display: flex;
+    width: 15%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: white;
 }
 
-/* #out{
-    background: #ddd;
-} */
+#filter-container>* {
+    padding: 10px;
+}
+
+#out{
+    background: #f0f3f5;
+}
 #left {
     float:left;
 }

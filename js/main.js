@@ -18,7 +18,8 @@ export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
 
 let timeslider = new TimeSlider({
-  parentElement: '#timeline'
+  parentElement: '#timeline',
+  containerWidth: 1000
 });
 
 // Relation graph
@@ -70,7 +71,8 @@ d3.json('data/rollup_force_data.json').then(_data => {
   });
 
   const geomap = new ChoroplethMap({ 
-    parentElement: '#geomap'
+    parentElement: '#geomap',
+    containerWidth: 1000
   },  worldGeoData);
 })
 .catch(error => console.error(error));
