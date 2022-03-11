@@ -1,3 +1,23 @@
+/* container */
+.container {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+}
+.row-container {
+    display: flex;
+}
+
+#out{
+    background: #ddd;
+}
+#left {
+    float:left;
+}
+#right {
+    float:right;
+}
+
 body {
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 13px;

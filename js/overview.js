@@ -7,8 +7,8 @@ class OverviewGraph {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 1200,
-            containerHeight: 1200,
+            containerWidth: 500,
+            containerHeight: 500,
             margin: {top: 25, right: 20, bottom: 20, left: 35},
             tooltipPadding: _config.tooltipPadding || 15
         }

@@ -16,6 +16,8 @@ timeline = [selectedTime, selectedTime];
 export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
 
+
+// Relation graph
 d3.json('data/rollup_force_data.json').then(_data => {
   primaryPartners = _data;
   overview = new OverviewGraph({
@@ -23,16 +25,18 @@ d3.json('data/rollup_force_data.json').then(_data => {
   }, primaryPartners[selectedTime]);
 })
 
-/**
- * Load TopoJSON data of the world and the data of the world wonders
- */
-
+// Geomap
  Promise.all([
   d3.json('data/africa.json'),
   d3.csv('data/region_population_density.csv'),
   d3.json('data/world.json'),
   d3.csv('data/clean_country_partner_hsproductsection_year.csv'),
 ]).then(data => {
+  let timeslider = new TimeSlider({
+    parentElement: '#timeline'
+  });
+
+
   const geoData = data[0];
   const countryData = data[1];
   let worldGeoData = data[2];
