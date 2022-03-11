@@ -9,7 +9,7 @@ let primaryPartners, filteredData, selectedTime = 1995;
 let overview, treemap, stackedLineChart, geomap, scatterplot;
 
 // Dispatcher
-const dispatcher = d3.dispatch('updateTime');
+const dispatcher = d3.dispatch('updateTime', 'time');
 
 // Filters
 countries = [];
@@ -17,10 +17,15 @@ timeline = [selectedTime, selectedTime];
 export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
 
-let timeslider = new TimeSlider({
-  parentElement: '#timeline',
+let uiweights = new UIWidgets({
+  parentElement: '#timeline', // Add other three filters here later
   containerWidth: 1000
-});
+}, dispatcher);
+
+dispatcher.on('time', updatedTimeline => {
+  timeline = updatedTimeline;
+})
+
 
 // Relation graph
 d3.json('data/rollup_force_data.json').then(_data => {

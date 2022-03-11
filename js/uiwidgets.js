@@ -1,7 +1,6 @@
 // I will change this into UIWidgets later
-class TimeSlider {
-
-    constructor(_config) {
+class UIWidgets {
+    constructor(_config, _dispatcher) {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: _config.containerWidth || 600,
@@ -13,7 +12,7 @@ class TimeSlider {
             legendRectHeight: 12,
             legendRectWidth: 150
         }
-
+        this.dispatcher = _dispatcher;
         this.initVis();
     }
 
@@ -61,10 +60,10 @@ class TimeSlider {
             .extent([[0, 0], [width, height]])
             .on("end", brushended));
     
-    function brushended(event, d) {
-      //if (!d3.event.sourceEvent) return; // Only transition after input.
-      //if (!d3.event.selection) return; // Ignore empty selections.
-      var d0 = d3.event.selection.map(x.invert),
+    function brushended(event) {
+      if (!event.sourceEvent) return; // Only transition after input.
+      if (!event.selection) return; // Ignore empty selections.
+      var d0 = event.selection.map(x.invert),
           d1 = d0.map(d3.timeYear.round);
     
       // If empty when rounded, use floor & ceil instead.
@@ -73,9 +72,11 @@ class TimeSlider {
         d1[1] = d3.timeYear.offset(d1[0]);
       }
     
-      // console.log(d0);
-      // console.log(d1);
-      d3.select(this).transition().call(d3.event.target.move, d1.map(x));
+      console.log([d0[0].getFullYear(), d0[1].getFullYear()]);
+      console.log([d1[0].getFullYear(), d1[1].getFullYear()]);
+      const updatedTimeline = [d1[0].getFullYear(), d1[1].getFullYear()];
+      d3.select(this).call(event.target.move, d1.map(x));
+      vis.dispatcher.call('time', event, updatedTimeline);
     }
         vis.updateVis();
     }
