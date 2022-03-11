@@ -7,8 +7,8 @@ class OverviewGraph {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 500,
-            containerHeight: 500,
+            containerWidth: 600,
+            containerHeight: 600,
             margin: {top: 25, right: 20, bottom: 20, left: 35},
             tooltipPadding: _config.tooltipPadding || 15
         }
@@ -29,10 +29,10 @@ class OverviewGraph {
         // Initialize scales
         vis.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
         vis.lengthScale = d3.scaleLinear()
-            .range([20, 100]);
+            .range([10, 50]);
         vis.radiusScale = d3.scaleLinear()
             .domain([40, 100])
-            .range([80, 60])
+            .range([50, 30])
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
