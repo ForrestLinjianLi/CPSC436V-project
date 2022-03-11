@@ -65,11 +65,11 @@ class ChoroplethMap {
           .attr('width', vis.config.legendRectWidth)
           .attr('height', vis.config.legendRectHeight);
   
-      vis.legendTitle = vis.legend.append('text')
-          .attr('class', 'legend-title')
-          .attr('dy', '.35em')
-          .attr('y', -10)
-          .text('Export value in one year')
+      // vis.legendTitle = vis.legend.append('text')
+      //     .attr('class', 'legend-title')
+      //     .attr('dy', '.35em')
+      //     .attr('y', -10)
+      //     .text('Export value in one year')
   
       vis.updateVis();
     }
@@ -103,7 +103,7 @@ class ChoroplethMap {
       //const countries = topojson.feature(vis.data, vis.data.objects.collection)
       const countries = vis.data;
       // console.log(countries);
-      // console.log(countries.features[1].properties.export_value);
+      console.log(countries.features[1].properties);
   
       // Defines the scale of the projection so that the geometry fits within the SVG area
       vis.projection.fitSize([vis.width, vis.height], countries);
@@ -115,11 +115,17 @@ class ChoroplethMap {
           .attr('class', 'country')
           .attr('d', vis.geoPath)
           .attr('fill', d => {
-            if (d.properties.export_value) {
-              //console.log(d.properties.export_value);
-              return vis.colorScale(d.properties.export_value);
+            if (d.properties.name == "USA") {
+              return "rgb(255,215,0)";
+            // if (d.properties.export_value) {
+            //   //console.log(d.properties.export_value);
+            //   console.log(vis.colorScale(d.properties.export_value));
+            //   return vis.colorScale(d.properties.export_value);
+            } else if (d.properties.name == "Canada" ||d.properties.name ==  "China" || d.properties.name ==  "Brazil") {
+              return "rgb(174,174,202)";
             } else {
-              return 'url(#lightstripe)';
+              return "rgb(220,220,220)";
+              // return 'url(#lightstripe)';
             }
           });
   
@@ -139,25 +145,25 @@ class ChoroplethMap {
             d3.select('#tooltip').style('display', 'none');
           });
   
-      // Add legend labels
-      vis.legend.selectAll('.legend-label')
-          .data(vis.legendStops)
-        .join('text')
-          .attr('class', 'legend-label')
-          .attr('text-anchor', 'middle')
-          .attr('dy', '.35em')
-          .attr('y', 20)
-          .attr('x', (d,index) => {
-            return index == 0 ? 0 : vis.config.legendRectWidth;
-          })
-          .text(d => Math.round(d.value * 10 ) / 10);
+      // // Add legend labels
+      // vis.legend.selectAll('.legend-label')
+      //     .data(vis.legendStops)
+      //   .join('text')
+      //     .attr('class', 'legend-label')
+      //     .attr('text-anchor', 'middle')
+      //     .attr('dy', '.35em')
+      //     .attr('y', 20)
+      //     .attr('x', (d,index) => {
+      //       return index == 0 ? 0 : vis.config.legendRectWidth;
+      //     })
+      //     .text(d => Math.round(d.value * 10 ) / 10);
   
-      // Update gradient for legend
-      vis.linearGradient.selectAll('stop')
-          .data(vis.legendStops)
-        .join('stop')
-          .attr('offset', d => d.offset)
-          .attr('stop-color', d => d.color);
+      // // Update gradient for legend
+      // vis.linearGradient.selectAll('stop')
+      //     .data(vis.legendStops)
+      //   .join('stop')
+      //     .attr('offset', d => d.offset)
+      //     .attr('stop-color', d => d.color);
   
       vis.legendRect.attr('fill', 'url(#legend-gradient)');
     }
