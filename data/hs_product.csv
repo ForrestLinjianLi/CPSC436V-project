@@ -1,0 +1,12 @@
+product_id,hs_product_code,hs_product_name_short_en
+0,0,Textiles
+1,1,Agriculture
+2,2,Stone
+3,3,Minerals
+4,4,Metals
+5,5,Chemicals
+6,6,Vehicles
+7,7,Machinery
+8,8,Electronics
+9,9,Other
+10,services,Services
