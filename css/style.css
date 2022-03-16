@@ -1,0 +1,120 @@
+.axis--grid .domain {
+    fill: #ddd;
+    stroke: none;
+}
+
+.axis--x .domain,
+.axis--grid .tick line {
+    stroke: #fff;
+}
+
+.axis--grid .tick--minor line {
+    stroke-opacity: .5;
+}
+
+/* container */
+#header-row-container {
+    display: flex;
+    width: 100%;
+}
+
+.container {
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.row-container {
+    position: relative;
+    margin: 10px;
+    align-content: start;
+    display: inline-flex;
+    left:10px;
+}
+
+#filter-container {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    width: 15%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: white;
+}
+
+#filter-container>* {
+    padding: 10px;
+}
+
+/* #out{
+    background: #f0f3f5;
+} */
+#left {
+    float:left;
+}
+#right {
+    float:right;
+}
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    padding: 30px;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.source {
+    font-size: 10px;
+    color: #888;
+}
+.source a {
+    color: #888;
+}
+
+.node {
+    z-index: 1;
+    position: relative;
+}
+
+line {
+    stroke: #ddd;
+    z-index: -1;
+    position: relative;
+}
+
+.link:hover,.link.hover,.link.highlight {
+    stroke-width: 2;
+    stroke: black;
+}
+
+.node:hover,.node.hover,.node.highlight {
+    stroke-width: 4;
+}
+
+/* Tooltip */
+#tooltip {
+    position: absolute;
+    display: none;
+    background: #fff;
+    box-shadow: 3px 3px 3px 0px rgb(92 92 92 / 0.5);
+    border: 1px solid #ddd;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px;
+    min-width: 160px;
+    color: #333;
+}
+.tooltip-title {
+    color: #000;
+    font-size: 14px;
+    font-weight: 600;
+}
+#tooltip ul {
+    margin: 5px 0 0 0;
+    padding-left: 20px;
+}
