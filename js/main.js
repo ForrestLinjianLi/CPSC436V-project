@@ -12,8 +12,8 @@ let overview, treemap, stackedLineChart, geomap, scatterplot;
 const dispatcher = d3.dispatch('updateTime', 'time');
 
 // Filters
-countries = [];
-timeline = [selectedTime, selectedTime];
+countries = ["China", "Canada"];
+timeline = [2001, 2010];
 export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
 
@@ -25,7 +25,6 @@ let uiweights = new UIWidgets({
 dispatcher.on('time', updatedTimeline => {
   timeline = updatedTimeline;
 })
-
 
 // Relation graph
 d3.json('data/rollup_force_data.json').then(_data => {
@@ -79,6 +78,7 @@ d3.json('data/rollup_force_data.json').then(_data => {
     parentElement: '#geomap',
     containerWidth: 1000
   },  worldGeoData);
+
 })
 .catch(error => console.error(error));
 
@@ -87,9 +87,43 @@ dispatcher.on('updateTime', s => {
   selectedTime = s;
   overview.data = primaryPartners[selectedTime];
   overview.updateVis();
+  scatterplot.updateVis();
 })
 
 
 function filterDataByTime() {
   filteredData = d3.filter(data, d => d.year >= timeline[0] && d.year <= timeline[1]);
+}
+
+// Filters
+
+
+// need to concate location, product, clean_country_partner
+d3.csv('data/merge_data.csv').then(data => {
+
+  data.forEach(d => {
+    d.import_value = +d.import_value;
+    d.export_value = +d.export_value;
+    d.year = +d.year;
+    d.country = d.location_name_short_en;
+    d.product = d.hs_product_name_short_en;
+  });
+  console.log(data)
+  scatterplot = new Scatterplot({
+    parentElement: '#scatter',
+    containerWidth: 1000
+  },  data);
+}).catch(error => console.error(error));
+
+/**
+ * Use geomap as filter and update scatter plot accordingly
+ */
+function filterData() {
+  if (countries.length == 0) {
+    scatterplot.selectData = [];
+  } else {
+    scatterplot.data = scatterplot.fullData.filter(d => countries.includes(d.country));
+    scatterplot.data = scatterplot.data.filter(d => d.year >= timeline[0] && d.year <= timeline[1]);
+  }
+  scatterplot.updateVis();
 }
