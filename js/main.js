@@ -17,6 +17,13 @@ timeline = [selectedTime, selectedTime];
 export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
 
+function checkAll() {
+  d3.selectAll('input').property('checked', true);
+}
+function uncheckAll() {
+  d3.selectAll('input').property('checked', false);
+}
+
 let uiweights = new UIWidgets({
   parentElement: '#timeline', // Add other three filters here later
   containerWidth: 1000
