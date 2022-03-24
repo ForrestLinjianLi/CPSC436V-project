@@ -1,18 +1,20 @@
 /**
  * Load data from CSV file asynchronously and render charts
  */
+
+
 // Filters 
-let countries, timeline, export_import, mode;
+let countries = new Set();
+let timeline, export_import, mode;
 
 // Figures
-let primaryPartners, filteredData, selectedTimeRange = [1995, 1995];
+let primaryPartners, filteredData, selectedTimeRange = [1995, 2000];
 let overview, treemap, stackedLineChart, geomap, scatterplot;
 
 // Dispatcher
 const dispatcher = d3.dispatch('updateTime', 'time');
 
 // Filters
-countries = [];
 export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
 
@@ -28,9 +30,28 @@ let uiweights = new UIWidgets({
   containerWidth: 1000
 }, dispatcher);
 
+let print_data;
+
+d3.json('data/rollup_force_data.json').then(_data => {
+  // country filters
+  for (let i = selectedTimeRange[0]; i <= selectedTimeRange[1]; i++) {
+    _data[i].node.map(a => a.id).forEach(item => countries.add(item));
+  }
+
+  var countryHTML = "";
+  countries.forEach(val => {
+    countryHTML += `
+      <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
+      </div>
+    `});
+
+  document.getElementById("country-filter").innerHTML = countryHTML;
+
+
 
 // Relation graph
-d3.json('data/rollup_force_data.json').then(_data => {
   primaryPartners = _data;
   overview = new OverviewGraph({
     parentElement: '#overview',
