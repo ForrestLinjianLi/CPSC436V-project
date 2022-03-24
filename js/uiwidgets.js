@@ -71,12 +71,9 @@ class UIWidgets {
         d1[0] = d3.timeYear.floor(d0[0]);
         d1[1] = d3.timeYear.offset(d1[0]);
       }
-    
-      console.log([d0[0].getFullYear(), d0[1].getFullYear()]);
-      console.log([d1[0].getFullYear(), d1[1].getFullYear()]);
       const updatedTimeline = [d1[0].getFullYear(), d1[1].getFullYear()];
       d3.select(this).call(event.target.move, d1.map(x));
-      vis.dispatcher.call('time', event, updatedTimeline);
+      vis.dispatcher.call('updateTime', event, updatedTimeline);
     }
         vis.updateVis();
     }

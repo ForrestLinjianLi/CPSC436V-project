@@ -5,7 +5,7 @@
 let countries, timeline, export_import, mode;
 
 // Figures
-let primaryPartners, filteredData, selectedTime = 1995;
+let primaryPartners, filteredData, selectedTimeRange = [1995, 1995];
 let overview, treemap, stackedLineChart, geomap, scatterplot;
 
 // Dispatcher
@@ -13,7 +13,6 @@ const dispatcher = d3.dispatch('updateTime', 'time');
 
 // Filters
 countries = [];
-timeline = [selectedTime, selectedTime];
 export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
 
@@ -29,17 +28,13 @@ let uiweights = new UIWidgets({
   containerWidth: 1000
 }, dispatcher);
 
-dispatcher.on('time', updatedTimeline => {
-  timeline = updatedTimeline;
-})
-
 
 // Relation graph
 d3.json('data/rollup_force_data.json').then(_data => {
   primaryPartners = _data;
   overview = new OverviewGraph({
     parentElement: '#overview',
-  }, primaryPartners[selectedTime]);
+  }, primaryPartners[1995]);
 })
 
 // Geomap
@@ -91,8 +86,9 @@ d3.json('data/rollup_force_data.json').then(_data => {
 
 
 dispatcher.on('updateTime', s => {
-  selectedTime = s;
-  overview.data = primaryPartners[selectedTime];
+  selectedTimeRange = s;
+  const selectedData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= s[0]) && (parseInt(d[0]) <= s[1]));
+
   overview.updateVis();
 })
 
