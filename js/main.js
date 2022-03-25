@@ -5,6 +5,7 @@
 
 // Filters 
 let countries = new Set();
+let countriesSelected = [];
 let timeline, export_import, mode;
 
 // Figures
@@ -12,25 +13,17 @@ let primaryPartners, filteredData, selectedTimeRange = [1995, 2000];
 let overview, treemap, stackedLineChart, geomap, scatterplot;
 
 // Dispatcher
-const dispatcher = d3.dispatch('updateTime', 'time');
+const dispatcher = d3.dispatch('updateSelectedCountries','updateTime', 'time');
 
 // Filters
 export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
-
-function checkAll() {
-  d3.selectAll('input').property('checked', true);
-}
-function uncheckAll() {
-  d3.selectAll('input').property('checked', false);
-}
 
 let uiweights = new UIWidgets({
   parentElement: '#timeline', // Add other three filters here later
   containerWidth: 1000
 }, dispatcher);
 
-let print_data;
 
 d3.json('data/rollup_force_data.json').then(_data => {
   // country filters
@@ -49,8 +42,7 @@ d3.json('data/rollup_force_data.json').then(_data => {
 
   document.getElementById("country-filter").innerHTML = countryHTML;
 
-
-
+  
 // Relation graph
   primaryPartners = _data;
   overview = new OverviewGraph({
@@ -115,3 +107,37 @@ dispatcher.on('updateTime', s => {
   }
   overview.updateVis();
 })
+
+
+function filterDataByTime() {
+  filteredData = d3.filter(data, d => d.year >= timeline[0] && d.year <= timeline[1]);
+}
+
+function checkAll() {
+  d3.selectAll('.form-check-input').property('checked', true); 
+  console.log(document.querySelector('.form-check-input').checked);
+}
+function uncheckAll() {
+  d3.selectAll('.form-check-input').property('checked', false);
+  console.log(document.querySelector('.form-check-input').checked);
+}
+
+setTimeout(() => {
+  //const inputs = document.querySelectorAll('.form-check');
+  const inputs = document.getElementsByClassName("form-check-input");
+  // console.log(inputs[0].checked);
+  for (const input of inputs) {
+    input.addEventListener('click', (event) => {
+      const elem = event.currentTarget;
+      const label = elem.parentNode.outerText;
+      if (elem.checked) {
+        countriesSelected.push(label);
+      } else {
+        countriesSelected = countriesSelected.filter(d => d!=label);
+      }
+      console.log(label);
+      console.log(countriesSelected);
+      // console.log(elem.parentNode);
+    });
+  }
+}, 100);
