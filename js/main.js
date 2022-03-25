@@ -117,9 +117,8 @@ dispatcher.on('updateSelectedCountries', () => {
     timeFilteredData[i][1].node.map(a => a.id).forEach(item => countries.add(item));
   }
 
-
   var countryHTML = "";
-  countries.forEach(val => {
+  Array.from(countries).sort().forEach(val => {
     countryHTML += `
       <div class="form-check">
           <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
@@ -144,6 +143,8 @@ dispatcher.on('updateTime', s => {
   overview.updateVis();
 })
 
+
+// TODO: Do we need this?
 function filterDataByTime() {
   filteredData = d3.filter(data, d => d.year >= timeline[0] && d.year <= timeline[1]);
 }
