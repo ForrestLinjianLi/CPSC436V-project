@@ -6,11 +6,12 @@
 // Filters 
 let countries = new Set();
 let countriesSelected = [];
-let export_import = 'export'; 
-let timeline, mode;
+let export_import = 'export';
+let selectedTimeRange = [1995, 2000];
+let mode;
 
 // Figures
-let primaryPartners, filteredData, selectedTimeRange = [1995, 2000];
+let primaryPartners;
 let overview, treemap, stackedLineChart, geomap, scatterplot;
 let timeFilteredData;
 
@@ -151,10 +152,6 @@ dispatcher.on('updateSelectedCountries', allSelected => {
   console.log(countriesSelected);
 })
 
-// TODO: Do we need this?
-function filterDataByTime() {
-  filteredData = d3.filter(data, d => d.year >= timeline[0] && d.year <= timeline[1]);
-}
 
 function checkAll() {
   d3.selectAll('.form-check-input').property('checked', true); 
