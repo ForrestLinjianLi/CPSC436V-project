@@ -49,9 +49,9 @@ Promise.all([
 
 function initViews() {
     // Country Filters
-    primaryPartners = data['rollupForceData'];
-    timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
-    dispatcher.call('updateDisplayedCountries');
+    // primaryPartners = data['rollupForceData'];
+    // timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
+    // dispatcher.call('updateDisplayedCountries');
 
     // Timeline 
     uiweights = new UIWidgets({
@@ -72,42 +72,44 @@ function initViews() {
 
     // need to concate location, product, clean_country_partner
     scatterplot = new Scatterplot({
-      parentElement: '#scatter',
-      containerWidth: 1000
+        parentElement: '#scatter',
+        containerWidth: 1000
     }, data["mergedRawData"]);
-};
+
+    updateCountryCheckboxex();
+}
 
 
 document.addEventListener("change", e => {
-  if (document.getElementById("btnradio1").checked) {
-      export_import = "export";
-  } else {
-      export_import = "import";
-  }
-  console.log(export_import);
+    if (document.getElementById("btnradio1").checked) {
+        export_import = "export";
+    } else {
+        export_import = "import";
+    }
+    console.log(export_import);
 })
 
 dispatcher.on('updateDisplayedCountries', () => {
-  updateCountryCheckbox().then(
-    function(value) {
-      const inputs = document.getElementsByClassName("form-check-input");
-      //console.log(inputs);
-      for (const input of inputs) {
-        input.addEventListener('click', (event) => {
-          const elem = event.currentTarget;
-          const label = elem.parentNode.outerText;
-          if (elem.checked) {
-            countriesSelected.push(label);
-          } else {
-            countriesSelected = countriesSelected.filter(d => d!=label);
-          }
-          console.log(label);
-          console.log(countriesSelected);
-          // console.log(elem.parentNode);
-        });
-      }
-    }
-  )
+    updateCountryCheckbox().then(
+        function (value) {
+            const inputs = document.getElementsByClassName("form-check-input");
+            //console.log(inputs);
+            for (const input of inputs) {
+                input.addEventListener('click', (event) => {
+                    const elem = event.currentTarget;
+                    const label = elem.parentNode.outerText;
+                    if (elem.checked) {
+                        countriesSelected.push(label);
+                    } else {
+                        countriesSelected = countriesSelected.filter(d => d != label);
+                    }
+                    console.log(label);
+                    console.log(countriesSelected);
+                    // console.log(elem.parentNode);
+                });
+            }
+        }
+    )
 });
 
 
@@ -149,46 +151,47 @@ function filterRollupForceDataByTimeRange(s) {
 }
 
 function updateScatterplot() {
-  if (countriesSelected.length == 0) {
-      scatterplot.data = [];
-  } else {
-      scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
-      scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
-  }
-  scatterplot.updateVis();
+    if (countriesSelected.length == 0) {
+        scatterplot.data = [];
+    } else {
+        scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
+        scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
+    }
+    scatterplot.updateVis();
 }
-
-async function updateCountryCheckbox() {
-  // country filters
-  countries.clear();
-
-  primaryPartners = data['rollupForceData'];
-  timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
-  console.log(timeFilteredData);
-
-  for (let i = 0; i < timeFilteredData.length; i++) {
-    timeFilteredData[i][1].node.map(a => a.id).forEach(item => countries.add(item));
-  }
-  
-  console.log(countries);
-  const myPromise = new Promise((resolve, reject) => {
-    var countryHTML = "";
-    Array.from(countries).sort().forEach(val => {
-      countryHTML += `
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-            <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
-        </div>
-    `});
-    // console.log(countryHTML);
-    resolve(countryHTML);
-  })
-  myPromise.then(v => {
-    document.getElementById("country-filter").innerHTML = v;
-  })
-  //.then(() => console.log(document.getElementById("country-filter").innerHTML));
-  //console.log(document.getElementById("country-filter").innerHTML);
-}
+//
+// async function updateCountryCheckbox() {
+//     // country filters
+//     countries.clear();
+//
+//     primaryPartners = data['rollupForceData'];
+//     timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
+//     console.log(timeFilteredData);
+//
+//     for (let i = 0; i < timeFilteredData.length; i++) {
+//         timeFilteredData[i][1].node.map(a => a.id).forEach(item => countries.add(item));
+//     }
+//
+//     console.log(countries);
+//     const myPromise = new Promise((resolve, reject) => {
+//         var countryHTML = "";
+//         Array.from(countries).sort().forEach(val => {
+//             countryHTML += `
+//         <div class="form-check">
+//             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+//             <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
+//         </div>
+//     `
+//         });
+//         // console.log(countryHTML);
+//         resolve(countryHTML);
+//     })
+//     myPromise.then(v => {
+//         document.getElementById("country-filter").innerHTML = v;
+//     })
+//     //.then(() => console.log(document.getElementById("country-filter").innerHTML));
+//     //console.log(document.getElementById("country-filter").innerHTML);
+// }
 
 function checkAll() {
     d3.selectAll('.form-check-input').property('checked', true);
@@ -200,18 +203,36 @@ function uncheckAll() {
     dispatcher.call('updateSelectedCountries', {}, false);
 }
 
-// function updateCountryCheckboxex() {
-//     // country filters
-//     countries.clear();
-//     timeFilteredData["node"].forEach(item => countries.add(item.id));
-//     var countryHTML = "";
-//     Array.from(countries).sort().forEach(val => {
-//         countryHTML += `
-//       <div class="form-check">
-//           <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-//           <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
-//       </div>
-//     `
-//     });
-//     document.getElementById("country-filter").innerHTML = countryHTML;
-// }
+function updateCountryCheckboxex() {
+    // country filters
+    countries.clear();
+    timeFilteredData["node"].forEach(item => countries.add(item.id));
+    var countryHTML = "";
+    Array.from(countries).sort().forEach(val => {
+        countryHTML += `
+      <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
+      </div>
+    `
+    });
+    document.getElementById("country-filter").innerHTML = countryHTML;
+
+    console.log(countries);
+    const myPromise = new Promise((resolve, reject) => {
+        var countryHTML = "";
+        Array.from(countries).sort().forEach(val => {
+            countryHTML += `
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
+        </div>
+    `
+        });
+        // console.log(countryHTML);
+        resolve(countryHTML);
+    })
+    myPromise.then(v => {
+        document.getElementById("country-filter").innerHTML = v;
+    })
+}
