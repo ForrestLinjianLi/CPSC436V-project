@@ -15,7 +15,7 @@ let overview, treemap, stackedLineChart, geomap, scatterplot;
 let timeFilteredData;
 
 // Dispatcher
-const dispatcher = d3.dispatch('updateSelectedCountries','updateTime', 'time');
+const dispatcher = d3.dispatch('updateDisplayedCountries', 'updateSelectedCountries', 'updateTime', 'time');
 
 // Filters
 mode = 'overview'; // overview/ exploration
@@ -41,7 +41,7 @@ d3.json('data/rollup_force_data.json').then(_data => {
   }
 
   var countryHTML = "";
-  countries.forEach(val => {
+  Array.from(countries).sort().forEach(val => {
     countryHTML += `
       <div class="form-check">
           <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
@@ -106,11 +106,8 @@ d3.json('data/rollup_force_data.json').then(_data => {
 })
 .catch(error => console.error(error));
 
-dispatcher.on('updateSelectedCountries', () => {
+dispatcher.on('updateDisplayedCountries', () => {
   // country filters
-  timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
-  console.log(timeFilteredData);
-
   countries.clear();
   
   for (let i = 0; i < timeFilteredData.length; i++) {
@@ -134,7 +131,9 @@ dispatcher.on('updateTime', s => {
   selectedTimeRange = s;
   console.log(selectedTimeRange);
 
-  dispatcher.call('updateSelectedCountries');
+  timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
+  console.log(timeFilteredData);
+  dispatcher.call('updateDisplayedCountries');
 
   overview.data = {
     "node": d3.rollups(timeFilteredData.map(d => d[1]["node"]).flat(), v => {return {"id": v[0].id, "partner_num": d3.sum(v, e => e.partner_num)}}, d => d.id).map(d => d[1]),
@@ -143,6 +142,14 @@ dispatcher.on('updateTime', s => {
   overview.updateVis();
 })
 
+dispatcher.on('updateSelectedCountries', allSelected => {
+  if (allSelected) {
+    countriesSelected = Array.from(countries).sort();
+  } else {
+    countriesSelected = []
+  }
+  console.log(countriesSelected);
+})
 
 // TODO: Do we need this?
 function filterDataByTime() {
@@ -151,11 +158,11 @@ function filterDataByTime() {
 
 function checkAll() {
   d3.selectAll('.form-check-input').property('checked', true); 
-  console.log(document.querySelector('.form-check-input').checked);
+  dispatcher.call('updateSelectedCountries', {}, true);
 }
 function uncheckAll() {
   d3.selectAll('.form-check-input').property('checked', false);
-  console.log(document.querySelector('.form-check-input').checked);
+  dispatcher.call('updateSelectedCountries', {}, false);
 }
 
 setTimeout(() => {
