@@ -16,8 +16,8 @@ class Scatterplot {
         this.fullData = _data;
         console.log(this.fullData)
 
-        this.data = this.fullData.filter(d => countries.includes(d.country));
-        this.data = this.data.filter(d => d.year >= timeline[0] && d.year <= timeline[1]);
+        this.data = this.fullData.filter(d => countriesSelected.includes(d.country));
+        this.data = this.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
         console.log(this.data);
         this.initVis();
     }
@@ -92,7 +92,7 @@ class Scatterplot {
         vis.xScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other", "Services"]);
         console.log(d3.max(vis.data, d => d.export_value))
         vis.yScale.domain([d3.max(vis.data, d => d.export_value), 0]);
-        vis.countryColorScale.domain(countries)
+        vis.countryColorScale.domain(countriesSelected)
         vis.renderVis();
     }
 

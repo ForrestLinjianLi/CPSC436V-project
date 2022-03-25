@@ -203,11 +203,11 @@ d3.csv('data/merge.csv').then(data => {
  * Use geomap as filter and update scatter plot accordingly
  */
 function filterData() {
-  if (countries.length == 0) {
+  if (countriesSelected.length == 0) {
     scatterplot.selectData = [];
   } else {
-    scatterplot.data = scatterplot.fullData.filter(d => countries.includes(d.country));
-    scatterplot.data = scatterplot.data.filter(d => d.year >= timeline[0] && d.year <= timeline[1]);
+    scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.country));
+    scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
   }
   scatterplot.updateVis();
 }
