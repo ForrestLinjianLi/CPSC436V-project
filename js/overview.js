@@ -95,7 +95,7 @@ class OverviewGraph {
     renderVis() {
         let vis = this;
         // Add links
-        const links = vis.links.selectAll('line')
+        const links = vis.links.selectAll('.link')
             .data(vis.data.link, d => [d.source, d.target])
             .join('line')
             .attr('class', d => `link link-${d.source.id} link-${d.target.id}`)
