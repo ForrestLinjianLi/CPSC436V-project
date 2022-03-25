@@ -145,7 +145,7 @@ dispatcher.on('updateTime', s => {
   if (countriesSelected.length == 0) {
     scatterplot.data = [];
   } else {
-    scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.country));
+    scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
     scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
   }
   scatterplot.updateVis();
