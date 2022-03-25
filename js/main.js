@@ -181,3 +181,33 @@ setTimeout(() => {
     });
   }
 }, 100);
+
+// need to concate location, product, clean_country_partner
+d3.csv('data/merge.csv').then(data => {
+
+  data.forEach(d => {
+    d.import_value = +d.import_value;
+    d.export_value = +d.export_value;
+    d.year = +d.year;
+    d.country = d.location_name_short_en;
+    d.product = d.hs_product_name_short_en;
+  });
+  console.log(data)
+  scatterplot = new Scatterplot({
+    parentElement: '#scatter',
+    containerWidth: 1000
+  },  data);
+}).catch(error => console.error(error));
+
+/**
+ * Use geomap as filter and update scatter plot accordingly
+ */
+function filterData() {
+  if (countries.length == 0) {
+    scatterplot.selectData = [];
+  } else {
+    scatterplot.data = scatterplot.fullData.filter(d => countries.includes(d.country));
+    scatterplot.data = scatterplot.data.filter(d => d.year >= timeline[0] && d.year <= timeline[1]);
+  }
+  scatterplot.updateVis();
+}
