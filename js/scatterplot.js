@@ -16,7 +16,7 @@ class Scatterplot {
         this.fullData = _data;
         console.log(this.fullData)
 
-        this.data = this.fullData.filter(d => countriesSelected.includes(d.country));
+        this.data = this.fullData.filter(d => countriesSelected.includes(d.location_code));
         this.data = this.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
         console.log(this.data);
         this.initVis();
@@ -84,7 +84,7 @@ class Scatterplot {
         let vis = this;
 
         // Specificy accessor functions
-        vis.colorValue = d => d.country;
+        vis.colorValue = d => d.location_code;
         vis.xValue = d => d.product;
         vis.yValue = d => d.export_value;
 

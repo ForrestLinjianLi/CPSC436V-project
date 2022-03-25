@@ -141,6 +141,14 @@ dispatcher.on('updateTime', s => {
     "link": d3.groups(timeFilteredData.map(d => d[1]["link"]).flat(), d => d.target, d => d.source).map(d => d[1]).flat().map(d => {return {"target": d[1][0].target, "source": d[1][0].source, "export_value": d3.sum(d[1], e=>e.export_value)}})
   }
   overview.updateVis();
+
+  if (countriesSelected.length == 0) {
+    scatterplot.data = [];
+  } else {
+    scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.country));
+    scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
+  }
+  scatterplot.updateVis();
 })
 
 dispatcher.on('updateSelectedCountries', allSelected => {
@@ -149,7 +157,16 @@ dispatcher.on('updateSelectedCountries', allSelected => {
   } else {
     countriesSelected = []
   }
+
   console.log(countriesSelected);
+
+  if (countriesSelected.length == 0) {
+    scatterplot.data = [];
+  } else {
+    scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
+    scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
+  }
+  scatterplot.updateVis();
 })
 
 
@@ -179,6 +196,14 @@ setTimeout(() => {
       console.log(countriesSelected);
       // console.log(elem.parentNode);
     });
+
+    if (countriesSelected.length == 0) {
+      scatterplot.data = [];
+    } else {
+      scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
+      scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
+    }
+    scatterplot.updateVis();
   }
 }, 100);
 
@@ -191,6 +216,7 @@ d3.csv('data/merge.csv').then(data => {
     d.year = +d.year;
     d.country = d.location_name_short_en;
     d.product = d.hs_product_name_short_en;
+    d.location_code = d.location_code;
   });
   console.log(data)
   scatterplot = new Scatterplot({
@@ -202,12 +228,12 @@ d3.csv('data/merge.csv').then(data => {
 /**
  * Use geomap as filter and update scatter plot accordingly
  */
-function filterData() {
-  if (countriesSelected.length == 0) {
-    scatterplot.selectData = [];
-  } else {
-    scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.country));
-    scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
-  }
-  scatterplot.updateVis();
-}
+// function filterData() {
+//   if (countriesSelected.length == 0) {
+//     scatterplot.selectData = [];
+//   } else {
+//     scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.country));
+//     scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
+//   }
+//   scatterplot.updateVis();
+// }
