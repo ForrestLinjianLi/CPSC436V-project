@@ -12,6 +12,7 @@ let timeline, mode;
 // Figures
 let primaryPartners, filteredData, selectedTimeRange = [1995, 2000];
 let overview, treemap, stackedLineChart, geomap, scatterplot;
+let timeFilteredData;
 
 // Dispatcher
 const dispatcher = d3.dispatch('updateSelectedCountries','updateTime', 'time');
@@ -105,17 +106,43 @@ d3.json('data/rollup_force_data.json').then(_data => {
 })
 .catch(error => console.error(error));
 
+dispatcher.on('updateSelectedCountries', () => {
+  // country filters
+  timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
+  console.log(timeFilteredData);
+
+  countries.clear();
+  
+  for (let i = 0; i < timeFilteredData.length; i++) {
+    timeFilteredData[i][1].node.map(a => a.id).forEach(item => countries.add(item));
+  }
+
+
+  var countryHTML = "";
+  countries.forEach(val => {
+    countryHTML += `
+      <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
+      </div>
+    `});
+
+  document.getElementById("country-filter").innerHTML = countryHTML;
+});
+
 
 dispatcher.on('updateTime', s => {
   selectedTimeRange = s;
-  const selectedData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= s[0]) && (parseInt(d[0]) <= s[1]));
+  console.log(selectedTimeRange);
+
+  dispatcher.call('updateSelectedCountries');
+
   overview.data = {
-    "node": d3.rollups(selectedData.map(d => d[1]["node"]).flat(), v => {return {"id": v[0].id, "partner_num": d3.sum(v, e => e.partner_num)}}, d => d.id).map(d => d[1]),
-    "link": d3.groups(selectedData.map(d => d[1]["link"]).flat(), d => d.target, d => d.source).map(d => d[1]).flat().map(d => {return {"target": d[1][0].target, "source": d[1][0].source, "export_value": d3.sum(d[1], e=>e.export_value)}})
+    "node": d3.rollups(timeFilteredData.map(d => d[1]["node"]).flat(), v => {return {"id": v[0].id, "partner_num": d3.sum(v, e => e.partner_num)}}, d => d.id).map(d => d[1]),
+    "link": d3.groups(timeFilteredData.map(d => d[1]["link"]).flat(), d => d.target, d => d.source).map(d => d[1]).flat().map(d => {return {"target": d[1][0].target, "source": d[1][0].source, "export_value": d3.sum(d[1], e=>e.export_value)}})
   }
   overview.updateVis();
 })
-
 
 function filterDataByTime() {
   filteredData = d3.filter(data, d => d.year >= timeline[0] && d.year <= timeline[1]);
