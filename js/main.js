@@ -6,7 +6,8 @@
 // Filters 
 let countries = new Set();
 let countriesSelected = [];
-let timeline, export_import, mode;
+let export_import = 'export'; 
+let timeline, mode;
 
 // Figures
 let primaryPartners, filteredData, selectedTimeRange = [1995, 2000];
@@ -16,8 +17,15 @@ let overview, treemap, stackedLineChart, geomap, scatterplot;
 const dispatcher = d3.dispatch('updateSelectedCountries','updateTime', 'time');
 
 // Filters
-export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
+document.addEventListener("change", e => {
+  if (document.getElementById("btnradio1").checked) {
+    export_import = "export";
+  } else {
+    export_import = "import";
+  }
+  console.log(export_import);
+})
 
 let uiweights = new UIWidgets({
   parentElement: '#timeline', // Add other three filters here later
