@@ -89,7 +89,7 @@ class Scatterplot {
         vis.yValue = d => d.export_value;
 
         // Set the scale input domains
-        vis.xScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other", "Services"]);
+        vis.xScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other"]);
         console.log(d3.max(vis.data, d => d.export_value))
         vis.yScale.domain([d3.max(vis.data, d => d.export_value), 0]);
         vis.countryColorScale.domain(countriesSelected)
