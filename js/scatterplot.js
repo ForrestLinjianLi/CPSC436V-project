@@ -8,7 +8,7 @@ class Scatterplot {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 600,
+            containerWidth: 800,
             containerHeight: 600,
             margin: {top: 25, right: 20, bottom: 20, left: 35},
             tooltipPadding: _config.tooltipPadding || 15
@@ -32,8 +32,8 @@ class Scatterplot {
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
-        vis.xScale = d3.scaleBand()
-            .range([0, vis.width]);
+        vis.xScale = d3.scalePoint()
+            .range([30, vis.width-30]);
 
         vis.yScale = d3.scaleLinear()
             .range([0, vis.height]);
@@ -42,11 +42,12 @@ class Scatterplot {
 
         // initialize axes
         vis.xAxis = d3.axisBottom(vis.xScale)
-            .tickSize(-vis.height - 10)
-            .tickPadding(10);
+            .tickSize(-vis.height - 10);
 
         vis.yAxis = d3.axisLeft(vis.yScale)
-            .tickSize(-vis.width);
+            .tickSize(-vis.width - 10)
+            .tickFormat(d3.format(".2s"))
+            .tickPadding(5);
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
@@ -69,8 +70,8 @@ class Scatterplot {
 
         vis.svg.append("text")
             .attr("class", "text-label")
-            .attr('y', 20)
-            .attr('x', 10)
+            .attr('y', 10)
+            .attr('x', 0)
             .text("Value");
 
         vis.updateVis();
@@ -89,9 +90,9 @@ class Scatterplot {
 
         // Set the scale input domains
         vis.xScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other", "Services"]);
-        vis.yScale.domain([0, d3.extent(vis.data, d => d.export_value)]);
+        console.log(d3.max(vis.data, d => d.export_value))
+        vis.yScale.domain([d3.max(vis.data, d => d.export_value), 0]);
         vis.countryColorScale.domain(countries)
-
         vis.renderVis();
     }
 
@@ -122,8 +123,7 @@ class Scatterplot {
                     <div class="tooltip-title">${d.country}</div>
                     <ul>
                       <li>Year: ${d.year}</li>
-                      <li>${d.product} Export Value: ${d.export_value}</li>
-                      <li>${d.product} Import Value: ${d.import_value}</li>
+                      <li>${d.product} ${export_import} value: ${d.export_value}</li>
                     <ul> 
                   `);
             })

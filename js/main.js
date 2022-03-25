@@ -12,8 +12,8 @@ let overview, treemap, stackedLineChart, geomap, scatterplot;
 const dispatcher = d3.dispatch('updateTime', 'time');
 
 // Filters
-countries = ["China", "Canada"];
-timeline = [2001, 2010];
+countries = ["China", "Canada", "Germany", "Netherlands"];
+timeline = [2001, 2003];
 export_import = 'export'; // export/ import
 mode = 'overview'; // overview/ exploration
 
@@ -99,7 +99,7 @@ function filterDataByTime() {
 
 
 // need to concate location, product, clean_country_partner
-d3.csv('data/merge_data.csv').then(data => {
+d3.csv('data/merge.csv').then(data => {
 
   data.forEach(d => {
     d.import_value = +d.import_value;
