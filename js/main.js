@@ -48,10 +48,8 @@ Promise.all([
 })
 
 function initViews() {
-    // Country Filters
-    // primaryPartners = data['rollupForceData'];
-    // timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
-    // dispatcher.call('updateDisplayedCountries');
+    // Country Checkboxes
+    dispatcher.call('updateDisplayedCountries');
 
     // Timeline 
     uiweights = new UIWidgets({
@@ -76,7 +74,7 @@ function initViews() {
         containerWidth: 1000
     }, data["mergedRawData"]);
 
-    updateCountryCheckboxex();
+    //updateCountryCheckboxex();
 }
 
 
@@ -90,6 +88,7 @@ document.addEventListener("change", e => {
 })
 
 dispatcher.on('updateDisplayedCountries', () => {
+    // Update HTML rendering, then update event listener 
     updateCountryCheckbox().then(
         function (value) {
             const inputs = document.getElementsByClassName("form-check-input");
@@ -120,7 +119,6 @@ dispatcher.on('updateTime', s => {
     overview.updateVis();
 
     updateScatterplot()
-    //updateCountryCheckboxex()
 })
 
 dispatcher.on('updateSelectedCountries', allSelected => {
@@ -159,64 +157,10 @@ function updateScatterplot() {
     }
     scatterplot.updateVis();
 }
-//
-// async function updateCountryCheckbox() {
-//     // country filters
-//     countries.clear();
-//
-//     primaryPartners = data['rollupForceData'];
-//     timeFilteredData = d3.filter(Object.entries(primaryPartners), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
-//     console.log(timeFilteredData);
-//
-//     for (let i = 0; i < timeFilteredData.length; i++) {
-//         timeFilteredData[i][1].node.map(a => a.id).forEach(item => countries.add(item));
-//     }
-//
-//     console.log(countries);
-//     const myPromise = new Promise((resolve, reject) => {
-//         var countryHTML = "";
-//         Array.from(countries).sort().forEach(val => {
-//             countryHTML += `
-//         <div class="form-check">
-//             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-//             <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
-//         </div>
-//     `
-//         });
-//         // console.log(countryHTML);
-//         resolve(countryHTML);
-//     })
-//     myPromise.then(v => {
-//         document.getElementById("country-filter").innerHTML = v;
-//     })
-//     //.then(() => console.log(document.getElementById("country-filter").innerHTML));
-//     //console.log(document.getElementById("country-filter").innerHTML);
-// }
 
-function checkAll() {
-    d3.selectAll('.form-check-input').property('checked', true);
-    dispatcher.call('updateSelectedCountries', {}, true);
-}
-
-function uncheckAll() {
-    d3.selectAll('.form-check-input').property('checked', false);
-    dispatcher.call('updateSelectedCountries', {}, false);
-}
-
-function updateCountryCheckboxex() {
-    // country filters
+async function updateCountryCheckbox() {
     countries.clear();
     timeFilteredData["node"].forEach(item => countries.add(item.id));
-    var countryHTML = "";
-    Array.from(countries).sort().forEach(val => {
-        countryHTML += `
-      <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-          <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
-      </div>
-    `
-    });
-    document.getElementById("country-filter").innerHTML = countryHTML;
 
     console.log(countries);
     const myPromise = new Promise((resolve, reject) => {
@@ -235,4 +179,16 @@ function updateCountryCheckboxex() {
     myPromise.then(v => {
         document.getElementById("country-filter").innerHTML = v;
     })
+    //.then(() => console.log(document.getElementById("country-filter").innerHTML));
+    //console.log(document.getElementById("country-filter").innerHTML);
+}
+
+function checkAll() {
+    d3.selectAll('.form-check-input').property('checked', true);
+    dispatcher.call('updateSelectedCountries', {}, true);
+}
+
+function uncheckAll() {
+    d3.selectAll('.form-check-input').property('checked', false);
+    dispatcher.call('updateSelectedCountries', {}, false);
 }
