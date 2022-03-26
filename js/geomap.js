@@ -61,11 +61,6 @@ class ChoroplethMap {
       vis.legendRect = vis.legend.append('rect')
           .attr('width', vis.config.legendRectWidth)
           .attr('height', vis.config.legendRectHeight);
-      
-      // vis.legendTitle = vis.legend.append('text')
-      //     .attr('class', 'legend-title')
-      //     .attr('dy', '.35em')
-      //     .attr('y', -10)
   
       vis.updateVis();
     }
@@ -160,6 +155,14 @@ class ChoroplethMap {
           })
           .text(d => Math.round(d.value/(10**9)));
 
+      vis.legend.selectAll('.legend-title')
+          .data(vis.export_import)
+        .join('text')
+          .attr('class', 'legend-title')
+          .attr('dy', '.35em')
+          .attr('y', -10)
+          .text(`${vis.export_import} in billion (USD$)`);
+
       // Update gradient for legend
       vis.linearGradient.selectAll('stop')
           .data(vis.legendStops)
@@ -168,13 +171,5 @@ class ChoroplethMap {
           .attr('stop-color', d => d.color);
 
       vis.legendRect.attr('fill', 'url(#legend-gradient)');
-
-      vis.legendTitle = vis.legend.append('text')
-          .data(vis.export_import)
-        .join('text')
-          .attr('class', 'legend-title')
-          .attr('dy', '.35em')
-          .attr('y', -10)
-          .text(`${vis.export_import} in billion (USD$)`);
     }
 }
