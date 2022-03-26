@@ -61,7 +61,7 @@ function initViews() {
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
         containerWidth: 1000
-    }, data["world"], data["rawData"], timeFilteredData, mode);
+    }, data["world"], data["rawData"], timeFilteredData, export_import);
 
     // need to concate location, product, clean_country_partner
     scatterplot = new Scatterplot({
@@ -147,8 +147,8 @@ function filterDataByTimeRange(s) {
                         "source": d[1][0].source,
                         "export_value": d3.sum(d[1], e => e.export_value),}
                   }),
-        "export_value": d3.rollup(tempTimeFilteredData2, v => d3.sum(v, d => d.export_value), d => d.location_code),
-        "import_value": d3.rollup(tempTimeFilteredData2, v => d3.sum(v, d => d.import_value), d => d.location_code),
+        "export": d3.rollup(tempTimeFilteredData2, v => d3.sum(v, d => d.export_value), d => d.location_code),
+        "import": d3.rollup(tempTimeFilteredData2, v => d3.sum(v, d => d.import_value), d => d.location_code),
     }
 }
 
