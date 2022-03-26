@@ -5,7 +5,7 @@ class ChoroplethMap {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data, _mode) {
+    constructor(_config, _world_data, _value_data, _value_data2, _export_import) {
       this.config = {
         parentElement: _config.parentElement,
         containerWidth: _config.containerWidth || 1000,
@@ -17,8 +17,11 @@ class ChoroplethMap {
         legendRectHeight: 12, 
         legendRectWidth: 150
       }
-      this.data = _data;
-      this.mode = _mode || "overview";
+      this.data = _world_data;
+      this.value_data = _value_data; // change
+      this.value_data2 = _value_data2; // change
+      this.export_import = _export_import;
+      //this.mode = _mode || "overview";
       this.initVis();
     }
     
@@ -65,106 +68,106 @@ class ChoroplethMap {
           .attr('width', vis.config.legendRectWidth)
           .attr('height', vis.config.legendRectHeight);
   
-      // vis.legendTitle = vis.legend.append('text')
-      //     .attr('class', 'legend-title')
-      //     .attr('dy', '.35em')
-      //     .attr('y', -10)
-      //     .text('Export value in one year')
+      vis.legendTitle = vis.legend.append('text')
+          .attr('class', 'legend-title')
+          .attr('dy', '.35em')
+          .attr('y', -10)
+          .text('Export value in one year')
   
       vis.updateVis();
     }
   
     updateVis() {
       let vis = this;
-  
-      const exportExtent = d3.extent(vis.data.features, d => d.properties.export_value);
-      //console.log(exportExtent);
-      // const importtExtent = d3.extent(vis.data.features, d => d.properties.import_value);
-      // const popDensityExtent = d3.extent(vis.data.objects.collection.geometries, d => d.properties.pop_density);
       
-      // Update color scale
-      //vis.colorScale.domain(popDensityExtent);
-      vis.colorScale.domain(exportExtent);
-        
-      // Define begin and end of the color gradient (legend)
-      vis.legendStops = [
-        { color: '#cfe2f2', value: exportExtent[0], offset: 0},
-        { color: '#0d306b', value: exportExtent[1], offset: 100},
-      ];
-  
-      vis.renderVis();
-    }
-  
-  
-    renderVis() {
-      let vis = this;
-  
-      // Convert compressed TopoJSON to GeoJSON format
-      //const countries = topojson.feature(vis.data, vis.data.objects.collection)
-      const countries = vis.data;
-      // console.log(countries);
-      console.log(countries.features[1].properties);
-  
-      // Defines the scale of the projection so that the geometry fits within the SVG area
-      vis.projection.fitSize([vis.width, vis.height], countries);
-  
-      // Append world map
-      const countryPath = vis.chart.selectAll('.country')
-          .data(countries.features)
-        .join('path')
-          .attr('class', 'country')
-          .attr('d', vis.geoPath)
-          .attr('fill', d => {
-            if (d.properties.name == "USA") {
-              return "rgb(255,215,0)";
-            // if (d.properties.export_value) {
-            //   //console.log(d.properties.export_value);
-            //   console.log(vis.colorScale(d.properties.export_value));
-            //   return vis.colorScale(d.properties.export_value);
-            } else if (d.properties.name == "Canada" ||d.properties.name ==  "China" || d.properties.name ==  "Brazil") {
-              return "rgb(174,174,202)";
-            } else {
-              return "rgb(220,220,220)";
-              // return 'url(#lightstripe)';
-            }
-          });
-  
-      countryPath
-          .on('mousemove', (event,d) => {
-            const export_value = d.properties.export_value ? `Export value: <strong>${d.properties.export_value}</strong> ` : 'No data available'; 
-            d3.select('#tooltip')
-              .style('display', 'block')
-              .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
-              .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-              .html(`
-                <div class="tooltip-title">${d.properties.name}</div>
-                <div>${export_value }</div>
-              `);
-          })
-          .on('mouseleave', () => {
-            d3.select('#tooltip').style('display', 'none');
-          });
-  
-      // // Add legend labels
-      // vis.legend.selectAll('.legend-label')
-      //     .data(vis.legendStops)
-      //   .join('text')
-      //     .attr('class', 'legend-label')
-      //     .attr('text-anchor', 'middle')
-      //     .attr('dy', '.35em')
-      //     .attr('y', 20)
-      //     .attr('x', (d,index) => {
-      //       return index == 0 ? 0 : vis.config.legendRectWidth;
-      //     })
-      //     .text(d => Math.round(d.value * 10 ) / 10);
-  
-      // // Update gradient for legend
-      // vis.linearGradient.selectAll('stop')
-      //     .data(vis.legendStops)
-      //   .join('stop')
-      //     .attr('offset', d => d.offset)
-      //     .attr('stop-color', d => d.color);
-  
-      vis.legendRect.attr('fill', 'url(#legend-gradient)');
-    }
+      vis.data.features.forEach(d => {
+        d.properties.export_value = vis.value_data2['export'].get(d.id);
+        d.properties.import_value = vis.value_data2['import'].get(d.id);
+      });
+ 
+    const exportExtent = d3.extent(vis.data.features, d => d.properties.export_value);
+    //console.log(exportExtent);
+    // const importtExtent = d3.extent(vis.data.features, d => d.properties.import_value);
+    // const popDensityExtent = d3.extent(vis.data.objects.collection.geometries, d => d.properties.pop_density);
+    
+    // Update color scale
+    //vis.colorScale.domain(popDensityExtent);
+    vis.colorScale.domain(exportExtent);
+      
+    // Define begin and end of the color gradient (legend)
+    vis.legendStops = [
+      { color: '#cfe2f2', value: exportExtent[0], offset: 0},
+      { color: '#0d306b', value: exportExtent[1], offset: 100},
+    ];
+
+    vis.renderVis();
   }
+
+
+  renderVis() {
+    let vis = this;
+
+    // Convert compressed TopoJSON to GeoJSON format
+    //const countries = topojson.feature(vis.data, vis.data.objects.collection)
+    const countries = vis.data;
+    // console.log(countries);
+    // console.log(countries.features[1].properties.export_value);
+
+    // Defines the scale of the projection so that the geometry fits within the SVG area
+    vis.projection.fitSize([vis.width, vis.height], countries);
+
+    // Append world map
+    const countryPath = vis.chart.selectAll('.country')
+        .data(countries.features)
+      .join('path')
+        .attr('class', 'country')
+        .attr('d', vis.geoPath)
+        .attr('fill', d => {
+          if (d.properties.export_value) {
+            //console.log(d.properties.export_value);
+            return vis.colorScale(d.properties.export_value);
+          } else {
+            return "rgb(220,220,220)";
+            //return 'url(#lightstripe)';
+          }
+        });
+
+    countryPath
+        .on('mousemove', (event,d) => {
+          const export_value = d.properties.export_value ? `Export value: <strong>${d.properties.export_value}</strong> ` : 'No data available'; 
+          d3.select('#tooltip')
+            .style('display', 'block')
+            .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
+            .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
+            .html(`
+              <div class="tooltip-title">${d.properties.name}</div>
+              <div>${export_value }</div>
+            `);
+        })
+        .on('mouseleave', () => {
+          d3.select('#tooltip').style('display', 'none');
+        });
+
+    // Add legend labels
+    vis.legend.selectAll('.legend-label')
+        .data(vis.legendStops)
+      .join('text')
+        .attr('class', 'legend-label')
+        .attr('text-anchor', 'middle')
+        .attr('dy', '.35em')
+        .attr('y', 20)
+        .attr('x', (d,index) => {
+          return index == 0 ? 0 : vis.config.legendRectWidth;
+        })
+        .text(d => Math.round(d.value * 10 ) / 10);
+
+    // Update gradient for legend
+    vis.linearGradient.selectAll('stop')
+        .data(vis.legendStops)
+      .join('stop')
+        .attr('offset', d => d.offset)
+        .attr('stop-color', d => d.color);
+
+    vis.legendRect.attr('fill', 'url(#legend-gradient)');
+  }
+}

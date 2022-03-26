@@ -13,23 +13,25 @@
 <body id="out">
 <div id="header-row-container">
     <h1>Global Trading Insight </h1>
-    <span class="placeholder col-5 opacity-0"></span>
-    <!-- <h1><span class="badge bg-secondary">Overview Mode</span></h1> -->
+    <!-- <span class="placeholder col-5 opacity-0"></span> -->
     <h1><span class="badge bg-secondary">Exploration Mode</span></h1>
 </div>
-<!-- <select class="form-select" aria-label="Default select example">
-    <option selected>Open this select menu</option>
-    <option value="1">One</option>
-    <option value="2">Two</option>
-    <option value="3">Three</option>
-</select> -->
 <div class="row-container">
-    <div class="container">
-        <div id="timeline"></div>
-        <div id="geomap"></div>
+    <div class="row-container">
+        <div class="container">
+            <div id="overview"></div>
+            <div id="slider"></div>
+            <div id="timeline"></div>
+        </div>
+    </div>
+    <div class="row-container">
+        <div class="container">
+            <div id="scatter"></div>
+            <div id="geomap"></div>
+        </div>
     </div>
     <div id="filter-container">
-        <button type="button" class="btn btn-outline-success">Go to Exploration</button>
+        <!-- <button type="button" class="btn btn-outline-success">Go to Exploration</button> -->
         <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
             <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
             <label class="btn btn-outline-primary" for="btnradio1">Export</label>
@@ -37,22 +39,11 @@
             <label class="btn btn-outline-primary" for="btnradio2">Import</label>
         </div>
         <div>
-            <h4>Selected Countries</h4>
-            <button type='button' onclick='checkAll()'>Check</button>
-            <button type='button' onclick='uncheckAll()'>Uncheck</button>
+            <h4>Compare Us (At Most 5)</h4>
+            <button type="button" class="btn btn-outline-dark" onclick='checkAll()'>Check 5</button>
+            <button type="button" class="btn btn-outline-secondary" onclick='uncheckAll()'>Uncheck</button>
             <div id="country-filter"> </div>
         </div>
-    </div>
-    <!-- <div id="slider"></div> -->
-</div>
-<div class="row-container">
-    <div class="container">
-        <div id="overview"></div>
-    </div>
-</div>
-<div class="row-container">
-    <div class="container">
-        <div id = "scatter"></div>
     </div>
 </div>
 

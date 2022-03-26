@@ -53,24 +53,24 @@ class OverviewGraph {
             .force('charge', d3.forceManyBody().strength(-40))
             .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2));
 
-        let slider = d3
-            .sliderHorizontal()
-            .domain([new Date(1995, 0, 1), new Date(2017, 0, 1)])
-            .tickFormat(d3.timeFormat("%Y"))
-            .ticks(23)
-            .width(vis.config.width)
-            .displayValue(true)
-            .on('onchange', (val) => {
-                dispatcher.call('updateTime',{}, val.getFullYear())
-            });
+        // let slider = d3
+        //     .sliderHorizontal()
+        //     .domain([new Date(1995, 0, 1), new Date(2017, 0, 1)])
+        //     .tickFormat(d3.timeFormat("%Y"))
+        //     .ticks(23)
+        //     .width(vis.config.width)
+        //     .displayValue(true)
+        //     .on('onchange', (val) => {
+        //         dispatcher.call('updateTime',{}, val.getFullYear())
+        //     });
 
-        d3.select('#slider')
-            .append('svg')
-            .attr('width', vis.config.width + 100)
-            .attr('height', 100)
-            .append('g')
-            .attr('transform', 'translate(30,30)')
-            .call(slider);
+        // d3.select('#slider')
+        //     .append('svg')
+        //     .attr('width', vis.config.width + 100)
+        //     .attr('height', 100)
+        //     .append('g')
+        //     .attr('transform', 'translate(30,30)')
+        //     .call(slider);
 
         vis.patterns = vis.chart.append('defs');
         vis.updateVis();
