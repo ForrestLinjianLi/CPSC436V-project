@@ -115,10 +115,11 @@ dispatcher.on('updateDisplayedCountries', () => {
 dispatcher.on('updateTime', s => {
     selectedTimeRange = s;
     dispatcher.call('updateDisplayedCountries');
-    overview.data = filterRollupForceDataByTimeRange(s)
+    filterRollupForceDataByTimeRange();
+    overview.data = timeFilteredData;
     overview.updateVis();
-
-    updateScatterplot()
+    updateScatterplot();
+    updateCountryCheckbox();
 })
 
 dispatcher.on('updateSelectedCountries', allSelected => {
@@ -132,13 +133,13 @@ dispatcher.on('updateSelectedCountries', allSelected => {
 })
 
 
-function filterRollupForceDataByTimeRange(s) {
-    timeFilteredData = d3.filter(Object.entries(data["rollupForceData"]), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
-    return {
-        "node": d3.rollups(timeFilteredData.map(d => d[1]["node"]).flat(), v => {
+function filterRollupForceDataByTimeRange() {
+    const filteredArray = d3.filter(Object.entries(data["rollupForceData"]), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
+    timeFilteredData = {
+        "node": d3.rollups(filteredArray.map(d => d[1]["node"]).flat(), v => {
             return {"id": v[0].id, "partner_num": d3.sum(v, e => e.partner_num)}
         }, d => d.id).map(d => d[1]),
-        "link": d3.groups(timeFilteredData.map(d => d[1]["link"]).flat(), d => d.target, d => d.source).map(d => d[1]).flat().map(d => {
+        "link": d3.groups(filteredArray.map(d => d[1]["link"]).flat(), d => d.target, d => d.source).map(d => d[1]).flat().map(d => {
             return {
                 "target": d[1][0].target,
                 "source": d[1][0].source,
