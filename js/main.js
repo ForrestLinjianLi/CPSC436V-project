@@ -48,7 +48,7 @@ function initViews() {
     // Timeline 
     uiweights = new UIWidgets({
         parentElement: '#timeline', // Add other three filters here later
-        containerWidth: 1000
+        containerWidth: 200
     }, dispatcher);
 
     // Relation graph
@@ -60,7 +60,7 @@ function initViews() {
     // TODO: change merged raw data into rollup force data 
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
-        containerWidth: 1000
+        containerWidth: 800
     }, data["world"], data["rawData"], timeFilteredData, export_import);
 
     // need to concate location, product, clean_country_partner

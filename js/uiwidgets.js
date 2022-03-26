@@ -19,8 +19,8 @@ class UIWidgets {
     initVis() {
         let vis = this;
 
-    var margin = {top: 20, right: 40, bottom: 50, left: 40},
-    width = 800 - margin.left - margin.right,
+    var margin = {top: 20, right: 0, bottom: 50, left: 40},
+    width = 600 - margin.left - margin.right,
     height = 150 - margin.top - margin.bottom;
 
     var x = d3.scaleTime()
