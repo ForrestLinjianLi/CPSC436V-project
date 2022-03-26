@@ -127,7 +127,8 @@ class ChoroplethMap {
             //console.log(d.properties.export_value);
             return vis.colorScale(d.properties.export_value);
           } else {
-            return 'url(#lightstripe)';
+            return "rgb(220,220,220)";
+            //return 'url(#lightstripe)';
           }
         });
 
