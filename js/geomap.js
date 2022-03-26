@@ -5,7 +5,7 @@ class ChoroplethMap {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data, _mode) {
+    constructor(_config, _world_data, _value_data, _value_data2, _timeline, _mode) {
       this.config = {
         parentElement: _config.parentElement,
         containerWidth: _config.containerWidth || 1000,
@@ -17,7 +17,9 @@ class ChoroplethMap {
         legendRectHeight: 12, 
         legendRectWidth: 150
       }
-      this.data = _data;
+      this.data = _world_data;
+      this.value_data = _value_data; // change
+      this.value_data2 = _value_data2; // change
       this.mode = _mode || "overview";
       this.initVis();
     }
@@ -76,6 +78,15 @@ class ChoroplethMap {
   
     updateVis() {
       let vis = this;
+
+      vis.data.features.forEach(d => {
+        for (let i = 0; i < vis.value_data.length; i++) {
+            if (d.id === vis.value_data[i].location_code) {
+                d.properties.export_value = + vis.value_data[i].export_value;
+                d.properties.import_value = + vis.value_data[i].import_value;
+            }
+        }
+    });
   
       const exportExtent = d3.extent(vis.data.features, d => d.properties.export_value);
       //console.log(exportExtent);
