@@ -66,19 +66,12 @@ function initViews() {
     // need to concate location, product, clean_country_partner
     scatterplot = new Scatterplot({
         parentElement: '#scatter',
-        containerWidth: 1000
+        containerWidth: 400
     }, data["mergedRawData"]);
 }
 
-
-document.addEventListener("change", e => {
-    if (document.getElementById("btnradio1").checked) {
-        export_import = "export";
-    } else {
-        export_import = "import";
-    }
-    console.log(export_import);
-})
+document.getElementById("btnradio1").addEventListener('click', () => {export_import = 'export'; console.log(export_import)});
+document.getElementById("btnradio2").addEventListener('click', () => {export_import = 'import'; console.log(export_import)});
 
 dispatcher.on('updateDisplayedCountries', () => {
     // Update HTML rendering, then update event listener 
