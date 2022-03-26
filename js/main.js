@@ -60,18 +60,24 @@ function initViews() {
     // TODO: change merged raw data into rollup force data
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
-        containerWidth: 800
-    }, data["world"], data["rawData"], timeFilteredData, export_import);
+        containerWidth: 600
+    }, data["world"], timeFilteredData, export_import);
 
     // need to concate location, product, clean_country_partner
     scatterplot = new Scatterplot({
         parentElement: '#scatter',
-        containerWidth: 400
+        containerWidth: 600
     }, data["mergedRawData"]);
 }
 
-document.getElementById("btnradio1").addEventListener('click', () => {export_import = 'export'; console.log(export_import)});
-document.getElementById("btnradio2").addEventListener('click', () => {export_import = 'import'; console.log(export_import)});
+document.getElementById("btnradio1").addEventListener('click', () => {
+    export_import = 'export'; 
+    updateGeomap();
+});
+document.getElementById("btnradio2").addEventListener('click', () => {
+    export_import = 'import'; 
+    updateGeomap();
+});
 
 dispatcher.on('updateDisplayedCountries', () => {
     // Update HTML rendering, then update event listener 
@@ -104,7 +110,7 @@ dispatcher.on('updateTime', s => {
     timeFilteredData = filterDataByTimeRange(s);
     console.log(timeFilteredData);
 
-    geomap.value_data2 = timeFilteredData;
+    geomap.value_data = timeFilteredData;
     geomap.updateVis();
 
     overview.data = timeFilteredData;
@@ -152,7 +158,12 @@ function updateScatterplot() {
         scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
         scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
     }
-    scatterplot.updateVis();
+    scatterplot.renderVis();
+}
+
+function updateGeomap() {
+    geomap.export_import = export_import;
+    geomap.updateVis();
 }
 
 async function updateCountryCheckbox() {
