@@ -2,7 +2,8 @@
 let countries = new Set();
 let countriesSelected = [];
 let export_import = 'export';
-let selectedTimeRange = [1995, 2000];
+let selectedTimeRange = [1995, 1995];
+let selectedTime = 1995; // TODO: Change all selected time range into selected time
 let mode = 'overview'; // overview/ exploration;
 
 // Figures
@@ -45,10 +46,31 @@ function initViews() {
     // Country Checkboxes
     dispatcher.call('updateDisplayedCountries');
 
+//     let slider = d3
+//     .sliderHorizontal()
+//     .domain([new Date(1995, 0, 1), new Date(2017, 0, 1)])
+//     .tickFormat(d3.timeFormat("%Y"))
+//     .ticks(23)
+//     .width(vis.config.width)
+//     .displayValue(true)
+//     .on('onchange', (val) => {
+//         const updatedTimeline = [val.getFullYear(), val.getFullYear()];
+//         dispatcher.call('updateTime', {}, updatedTimeline);
+
+//     });
+
+
+// d3.select('#slider')
+//     .append('svg')
+//     .attr('width', 600)
+//     .attr('height', 100)
+//     .append('g')
+//     .attr('transform', `translate(30, 30)`)
+//     .call(slider);
+
     // Timeline 
     uiweights = new UIWidgets({
-        parentElement: '#timeline', // Add other three filters here later
-        containerWidth: 200
+        parentElement: '#slider', // Add other three filters here later
     }, dispatcher);
 
     // Relation graph
