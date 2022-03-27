@@ -4,7 +4,7 @@ class OverviewGraph {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data) {
+    constructor(_config, _data, _barChart) {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: 600,
@@ -13,6 +13,7 @@ class OverviewGraph {
             tooltipPadding: _config.tooltipPadding || 15
         }
         this.data = _data;
+        this.barChart = _barChart;
         this.initVis();
     }
 
@@ -27,7 +28,7 @@ class OverviewGraph {
         vis.config.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
         // Initialize scales
-        vis.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+        vis.opacityScale = d3.scaleLinear().range([0.1,1]);
         vis.lengthScale = d3.scaleLinear()
             .range([10, 50]);
         vis.radiusScale = d3.scaleLinear()
@@ -53,25 +54,6 @@ class OverviewGraph {
             .force('charge', d3.forceManyBody().strength(-40))
             .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2));
 
-        // let slider = d3
-        //     .sliderHorizontal()
-        //     .domain([new Date(1995, 0, 1), new Date(2017, 0, 1)])
-        //     .tickFormat(d3.timeFormat("%Y"))
-        //     .ticks(23)
-        //     .width(vis.config.width)
-        //     .displayValue(true)
-        //     .on('onchange', (val) => {
-        //         dispatcher.call('updateTime',{}, val.getFullYear())
-        //     });
-
-        // d3.select('#slider')
-        //     .append('svg')
-        //     .attr('width', vis.config.width + 100)
-        //     .attr('height', 100)
-        //     .append('g')
-        //     .attr('transform', 'translate(30,30)')
-        //     .call(slider);
-
         vis.patterns = vis.chart.append('defs');
         vis.updateVis();
     }
@@ -81,6 +63,7 @@ class OverviewGraph {
      */
     updateVis() {
         let vis = this;
+        vis.opacityScale.domain([d3.min(vis.data.link, d => d.value),d3.max(vis.data.link, d => d.value)])
         vis.lengthScale.domain([1, d3.max(vis.data.node, d=>d.partner_num)]);
         // Add node-link data to simulation
         vis.simulation.nodes(vis.data.node);
@@ -100,6 +83,7 @@ class OverviewGraph {
             .join('line')
             .attr('class', d => `link link-${d.source.id} link-${d.target.id}`)
             .attr('stroke-width', 2)
+            .attr('opacity', d => vis.opacityScale(d.value))
             .on('mouseover',(event, d) => {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', true);
                 d3.select('#tooltip')
@@ -144,16 +128,12 @@ class OverviewGraph {
             .call(drag(vis.simulation))
             .on('mouseover', (event, d) => {
                 d3.selectAll('.link-'+d.id).classed('hover', true);
-                d3.select('#tooltip')
+                d3.select('#relation-tooltip')
                     .style('display', 'block')
                     .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
-                    .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
-                    .html(`
-                      <div class="tooltip-title">${d.id}</div>
-                      <ul>
-                        <li>Number of primary trading partners: ${d.partner_num}</li>
-                      </ul>
-                    `);
+                    .style('top', (event.pageY + vis.config.tooltipPadding) + 'px');
+                d3.select("#relation-tooltip-tile").text("asdasdasd");
+                dispatcher.call("updateRelationBarChart", event, d);
             })
             .on('mouseleave', (event, d) => {
                 d3.selectAll('.link-'+d.id).classed('hover', false);

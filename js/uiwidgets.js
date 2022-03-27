@@ -28,7 +28,7 @@ class UIWidgets {
         .width(500)
         .displayValue(false)
         .on('onchange', (val) => {
-            const updatedTimeline = [val.getFullYear(), val.getFullYear()];
+            const updatedTimeline = val.getFullYear();
             vis.dispatcher.call('updateTime', {}, updatedTimeline);
     
         });

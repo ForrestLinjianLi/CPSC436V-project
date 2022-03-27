@@ -87,8 +87,8 @@ h1 {
     position: relative;
 }
 
-line {
-    stroke: #ddd;
+.link {
+    stroke: black;
     z-index: -1;
     position: relative;
 }
@@ -103,7 +103,7 @@ line {
 }
 
 /* Tooltip */
-#tooltip {
+.tooltip {
     position: absolute;
     display: none;
     background: #fff;
