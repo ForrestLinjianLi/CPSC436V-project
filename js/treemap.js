@@ -84,7 +84,7 @@ class TreeMap {
         // stratify the data: reformatting for d3.js
 
         let data = vis.data;
-
+        console.log(data)
         let year, country;
         if(data[0] != null){
             year = data[0].year;

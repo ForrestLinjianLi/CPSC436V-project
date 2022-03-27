@@ -64,10 +64,10 @@ function initViews() {
     }, data["world"], timeFilteredData, export_import);
 
     // need to concate location, product, clean_country_partner
-    scatterplot = new Scatterplot({
-        parentElement: '#scatter',
-        containerWidth: 600
-    }, data["mergedRawData"]);
+    // scatterplot = new Scatterplot({
+    //     parentElement: '#scatter',
+    //     containerWidth: 600
+    // }, data["mergedRawData"]);
 
     // treeMap
     treemap = new TreeMap({
@@ -173,7 +173,7 @@ function updateScatterplot() {
     scatterplot.updateVis();
 }
 
-function uodateTreeMap() {
+function updateTreeMap() {
     if (countriesSelected.length == 0) {
         treemap.data = [];
     } else {
@@ -224,11 +224,19 @@ function determineMode(){
     console.log("determine mode...")
     if(countriesSelected.length == 1) {
         // exploration mode
+        d3.select("#scatter").html("");
         document.getElementById('modeTitle').innerHTML = "Exploration Mode";
-        uodateTreeMap();
+        treemap = new TreeMap({
+            parentElement: '#scatter',
+            containerWidth: 600
+        }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
+        d3.select("#scatter").html("");
         document.getElementById('modeTitle').innerHTML = "Overview Mode";
-        updateScatterplot();
+        scatterplot = new Scatterplot({
+            parentElement: '#scatter',
+            containerWidth: 600
+        }, data["mergedRawData"]);
     }
 }
