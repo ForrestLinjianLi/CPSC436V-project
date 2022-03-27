@@ -8,7 +8,7 @@ class Scatterplot {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 800,
+            containerWidth: 700,
             containerHeight: 450,
             margin: {top: 60, right: 90, bottom: 20, left: 55},
             tooltipPadding: _config.tooltipPadding || 15
@@ -17,6 +17,7 @@ class Scatterplot {
         console.log(this.fullData)
 
         this.data = this.fullData.filter(d => countriesSelected.includes(d.location_code));
+        this.data = this.data.filter(d => d.year >= selectedTime && d.year <= selectedTime);
         console.log(this.data);
         this.initVis();
     }
@@ -61,11 +62,13 @@ class Scatterplot {
         // Append empty x-axis group and move it to the bottom of the chart
         vis.xAxisG = vis.chart.append('g')
             .attr('class', 'axis x-axis')
-            .attr('transform', `translate(0,${vis.height})`);
+            .attr('transform', `translate(0,${vis.height})`)
+            .attr("stroke-opacity", 0.2);
 
         // Append y-axis group
         vis.yAxisG = vis.chart.append('g')
-            .attr('class', 'axis y-axis');
+            .attr('class', 'axis y-axis')
+            .attr("stroke-opacity", 0.2);
 
         vis.colorLegendG = vis.chart.append('g')
             .attr('transform', `translate(${vis.width + 10}, 20)`);
@@ -91,7 +94,7 @@ class Scatterplot {
 
         vis.svg.append('text')
             .attr('id', 'scatterTitle')
-            .attr("x", 380)
+            .attr("x", 330)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .attr('font-size', '21px')

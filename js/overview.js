@@ -7,9 +7,9 @@ class OverviewGraph {
     constructor(_config, _data, _barChart, _dispatcher) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 600,
+            containerWidth: 800,
             containerHeight: 600,
-            margin: {top: 25, right: 20, bottom: 20, left: 35},
+            margin: {top: 25, right: 20, bottom: 20, left: 20},
             tooltipPadding: _config.tooltipPadding || 15,
             maxNode: 20
         }
