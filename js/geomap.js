@@ -128,14 +128,15 @@ class ChoroplethMap {
 
       countryPath
           .on('mousemove', (event,d) => {
-            const export_value = d.properties.export_value ? `Export value: <strong>${d.properties.value}</strong> ` : 'No data available'; 
+            console.log(vis.export_import);
+            const value = d.properties.value ? `${vis.export_import} value: <strong>$${Math.round(d.properties.value/(10**9))}</strong> billion` : 'No data available'; 
             d3.select('#tooltip')
               .style('display', 'block')
               .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')   
               .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
               .html(`
                 <div class="tooltip-title">${d.properties.name}</div>
-                <div>${export_value }</div>
+                <div>${value}</div>
               `);
           })
           .on('mouseleave', () => {
