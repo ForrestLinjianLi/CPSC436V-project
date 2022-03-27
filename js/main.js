@@ -57,7 +57,6 @@ function initViews() {
     }, timeFilteredData);
 
     // Geomap
-    // TODO: change merged raw data into rollup force data
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
         containerWidth: 600
@@ -94,6 +93,7 @@ function updateDisplayedCountries() {
     updateCountryCheckbox().then(
         function (value) {
             const inputs = document.getElementsByClassName("form-check-input");
+            d3.selectAll('.form-check-input')._groups[0][0].checked  = true;
             //console.log(inputs);
             for (const input of inputs) {
                 input.addEventListener('click', (event) => {
@@ -206,7 +206,6 @@ async function updateCountryCheckbox() {
         </div>
     `
         });
-        // console.log(countryHTML);
         resolve(countryHTML);
     })
     myPromise.then(v => {
@@ -216,15 +215,21 @@ async function updateCountryCheckbox() {
     //console.log(document.getElementById("country-filter").innerHTML);
 }
 
-// TODO: Check at most 5 countries
-// function checkAll() {
-//     d3.selectAll('.form-check-input').property('checked', true);
-//     updateSelectedCountries(true);
+// Check 5 countries
+function checkAll() {
+    const sel = d3.selectAll('.form-check-input');
+    for (let i = 0; i < 5; i++) {
+        sel._groups[0][i].checked = true;
+    }
+    updateSelectedCountries(true);
     
-// }
+}
 
+// uncheck to 1 country
 function uncheckAll() {
-    d3.selectAll('.form-check-input').property('checked', false);
+    const sel = d3.selectAll('.form-check-input');
+    sel.property('checked', false);
+    sel._groups[0][0].checked = true;
     updateSelectedCountries(false);
     determineMode();
 }
