@@ -1,6 +1,6 @@
 // Filters
 let countries = new Set();
-let countriesSelected = [];
+let countriesSelected = ['CAN'];
 let export_import = 'export';
 let selectedTimeRange = [1995, 1995];
 let selectedTime = 1995; // TODO: Change all selected time range into selected time
@@ -68,16 +68,26 @@ function initViews() {
         parentElement: '#scatter',
         containerWidth: 600
     }, data["mergedRawData"]);
+
+    // treeMap
+    treemap = new TreeMap({
+        parentElement: '#scatter',
+        containerWidth: 600
+    }, data["mergedRawData"]);
+
 }
 
 document.getElementById("btnradio1").addEventListener('click', () => {
-    export_import = 'export'; 
+    export_import = 'export';
+    console.log(export_import);
     updateGeomap();
+    determineMode();
 });
 document.getElementById("btnradio2").addEventListener('click', () => {
-    export_import = 'import'; 
+    export_import = 'import';
+    console.log(export_import);
     updateGeomap();
-});
+    determineMode();});
 
 dispatcher.on('updateDisplayedCountries', () => {
     // Update HTML rendering, then update event listener 
@@ -97,6 +107,7 @@ dispatcher.on('updateDisplayedCountries', () => {
                     console.log(label);
                     console.log(countriesSelected);
                     // console.log(elem.parentNode);
+                    determineMode();
                 });
             }
         }
@@ -116,7 +127,8 @@ dispatcher.on('updateTime', s => {
     overview.data = timeFilteredData;
     overview.updateVis();
 
-    updateScatterplot();
+    determineMode();
+
 })
 
 dispatcher.on('updateSelectedCountries', allSelected => {
@@ -126,7 +138,7 @@ dispatcher.on('updateSelectedCountries', allSelected => {
         countriesSelected = [];
     }
     console.log(countriesSelected);
-    updateScatterplot();
+    determineMode();
 })
 
 function filterDataByTimeRange(s) {
@@ -158,7 +170,17 @@ function updateScatterplot() {
         scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
         scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
     }
-    scatterplot.renderVis();
+    scatterplot.updateVis();
+}
+
+function uodateTreeMap() {
+    if (countriesSelected.length == 0) {
+        treemap.data = [];
+    } else {
+        treemap.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
+        treemap.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
+    }
+    treemap.updateVis();
 }
 
 function updateGeomap() {
@@ -192,13 +214,21 @@ async function updateCountryCheckbox() {
     //console.log(document.getElementById("country-filter").innerHTML);
 }
 
-// TODO: Check at most 5 countries
-function checkAll() {
-    d3.selectAll('.form-check-input').property('checked', true);
-    dispatcher.call('updateSelectedCountries', {}, true);
-}
-
 function uncheckAll() {
     d3.selectAll('.form-check-input').property('checked', false);
     dispatcher.call('updateSelectedCountries', {}, false);
+    determineMode();
+}
+
+function determineMode(){
+    console.log("determine mode...")
+    if(countriesSelected.length == 1) {
+        // exploration mode
+        document.getElementById('modeTitle').innerHTML = "Exploration Mode";
+        uodateTreeMap();
+    } else if(countriesSelected.length > 1) {
+        // overview mode
+        document.getElementById('modeTitle').innerHTML = "Overview Mode";
+        updateScatterplot();
+    }
 }

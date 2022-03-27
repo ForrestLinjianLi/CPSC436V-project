@@ -10,7 +10,7 @@ class Scatterplot {
             parentElement: _config.parentElement,
             containerWidth: 600,
             containerHeight: 400,
-            margin: {top: 25, right: 20, bottom: 20, left: 35},
+            margin: {top: 30, right: 20, bottom: 20, left: 55},
             tooltipPadding: _config.tooltipPadding || 15
         }
         this.fullData = _data;
@@ -46,7 +46,7 @@ class Scatterplot {
 
         vis.yAxis = d3.axisLeft(vis.yScale)
             .tickSize(-vis.width - 10)
-            .tickFormat(d3.format(".2s"))
+            .tickFormat(function(d){return d/1000000000 + " Billion"})
             .tickPadding(5);
 
         // Define size of SVG drawing area
@@ -70,9 +70,10 @@ class Scatterplot {
 
         vis.svg.append("text")
             .attr("class", "text-label")
-            .attr('y', 10)
+            .attr("id", "valueText")
+            .attr('y', 11)
             .attr('x', 0)
-            .text("Value");
+            .text("Export Value");
 
         vis.updateVis();
     }
@@ -82,16 +83,17 @@ class Scatterplot {
      */
     updateVis() {
         let vis = this;
+        d3.select("#valueText").text((export_import == "export") ? "Export Value":"Import Value");
 
         // Specificy accessor functions
         vis.colorValue = d => d.location_code;
         vis.xValue = d => d.product;
-        vis.yValue = d => d.export_value;
+        vis.yValue = (export_import == "export") ? d => d.export_value : d => d.import_value;
 
         // Set the scale input domains
         vis.xScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other"]);
-        console.log(d3.max(vis.data, d => d.export_value))
-        vis.yScale.domain([d3.max(vis.data, d => d.export_value), 0]);
+        let max = (export_import == "export") ? d3.max(vis.data, d => d.export_value) : d3.max(vis.data, d => d.import_value);
+        vis.yScale.domain([max, 0]);
         vis.countryColorScale.domain(countriesSelected)
         vis.renderVis();
     }
@@ -104,7 +106,7 @@ class Scatterplot {
 
         // Add circles
         const circles = vis.chart.selectAll('.point')
-            .data(vis.data, d => d.export_value)
+            .data(vis.data, (export_import == "export") ? d => d.export_value:d => d.import_value)
             .join('circle')
             .attr('class', 'point')
             .attr('r', '8px')  // circle 8px
@@ -119,11 +121,19 @@ class Scatterplot {
                     .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
                     .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
                     .style("padding", "5px")
-                    .html(`
+                    .html(
+                        (export_import == "export") ?
+                        `
                     <div class="tooltip-title">${d.country}</div>
                     <ul>
                       <li>Year: ${d.year}</li>
-                      <li>${d.product} ${export_import} value: ${d.export_value}</li>
+                      <li>${d.product} ${export_import} value: ${(d.export_value/1000000000).toPrecision(4)} Billion USD</li>
+                    <ul> 
+                  `: `
+                    <div class="tooltip-title">${d.country}</div>
+                    <ul>
+                      <li>Year: ${d.year}</li>
+                      <li>${d.product} ${export_import} value: ${(d.import_value/1000000000).toPrecision(4)} Billion USD</li>
                     <ul> 
                   `);
             })

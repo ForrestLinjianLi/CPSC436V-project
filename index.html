@@ -14,7 +14,7 @@
 <div id="header-row-container">
     <h1>Global Trading Insight </h1>
     <!-- <span class="placeholder col-5 opacity-0"></span> -->
-    <h1><span class="badge bg-secondary">Exploration Mode</span></h1>
+    <h1><span class="badge bg-secondary" id = "modeTitle">Exploration Mode</span></h1>
 </div>
 <div class="row-container">
     <div class="row-container">
@@ -46,7 +46,11 @@
         </div>
     </div>
 </div>
-
+<div class="row-container">
+    <div class="container">
+        <div id="treemap"></div>
+    </div>
+</div>
 <div id="tooltip"></div>
 
 <script src="js/lib/d3.v6.min.js"></script>
@@ -55,6 +59,7 @@
 <script src="js/uiwidgets.js"></script>
 <script src="js/geomap.js"></script>
 <script src="js/scatterplot.js"></script>
+<script src="js/treemap.js"></script>
 <script src="js/overview.js"></script>
 <script src="js/main.js"></script>
 </body>
