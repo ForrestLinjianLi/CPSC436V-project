@@ -4,16 +4,18 @@ class OverviewGraph {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _data, _barChart) {
+    constructor(_config, _data, _barChart, _dispatcher) {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: 600,
             containerHeight: 600,
             margin: {top: 25, right: 20, bottom: 20, left: 35},
-            tooltipPadding: _config.tooltipPadding || 15
+            tooltipPadding: _config.tooltipPadding || 15,
+            maxNode: 20
         }
         this.data = _data;
         this.barChart = _barChart;
+        this.dispatcher = _dispatcher;
         this.initVis();
     }
 
@@ -55,6 +57,68 @@ class OverviewGraph {
             .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2));
 
         vis.patterns = vis.chart.append('defs');
+        let yearSlider = d3
+            .sliderHorizontal()
+            .domain([1995, 2017])
+            .tickFormat(d => d + "")
+            .ticks(10)
+            .width(500)
+            .step(1)
+            .displayValue(false)
+            .on('onchange', (val) => {
+                vis.dispatcher.call('updateTime', {}, parseInt(val));
+            });
+
+        let numberSlider = d3
+            .sliderHorizontal()
+            .domain([1,40])
+            .ticks(23)
+            .width(500)
+            .step(1)
+            .displayValue(false)
+            .on('onchange', (val) => {
+                vis.config.maxNode = val;
+                vis.updateVis();
+            });
+
+        let forceSlider = d3
+            .sliderHorizontal()
+            .domain([0, 2000])
+            .ticks(10)
+            .width(500)
+            .step(100)
+            .displayValue(false)
+            .on('onchange', (val) => {
+                let vis = this;
+                vis.simulation.force('charge', d3.forceManyBody()
+                    .strength(-val))
+                    .restart();
+            });
+
+
+        d3.select('#year-slider')
+            .append('svg')
+            .attr('width', 600)
+            .attr('height', 80)
+            .append('g')
+            .attr('transform', `translate(30, 15)`)
+            .call(yearSlider);
+
+        d3.select('#number-slider')
+            .append('svg')
+            .attr('width', 600)
+            .attr('height', 80)
+            .append('g')
+            .attr('transform', `translate(30, 15)`)
+            .call(numberSlider);
+
+        d3.select('#force-slider')
+            .append('svg')
+            .attr('width', 600)
+            .attr('height', 80)
+            .append('g')
+            .attr('transform', `translate(30,15)`)
+            .call(forceSlider);
         vis.updateVis();
     }
 
@@ -63,11 +127,14 @@ class OverviewGraph {
      */
     updateVis() {
         let vis = this;
+        let sorted = new Set(vis.data.node.slice().sort((a,b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode+1)));
+        vis.filteredNode = vis.data.node.filter(d=> sorted.has(d.id));
+        vis.filteredLink = vis.data.link.filter(d => (sorted.has(d.target) && sorted.has(d.source) || sorted.has(d.target.id) && sorted.has(d.source.id)));
         vis.opacityScale.domain([d3.min(vis.data.link, d => d.value),d3.max(vis.data.link, d => d.value)])
         vis.lengthScale.domain([1, d3.max(vis.data.node, d=>d.partner_num)]);
         // Add node-link data to simulation
-        vis.simulation.nodes(vis.data.node);
-        vis.simulation.force('link').links(vis.data.link).distance(100);
+        vis.simulation.nodes(vis.filteredNode);
+        vis.simulation.force('link').links(vis.filteredLink).distance(100);
         vis.simulation.force('collide',d3.forceCollide().radius(vis.radiusScale(vis.data.node.length)).iterations(2));
         vis.renderVis();
     }
@@ -77,32 +144,33 @@ class OverviewGraph {
      */
     renderVis() {
         let vis = this;
+
         // Add links
         const links = vis.links.selectAll('.link')
-            .data(vis.data.link, d => [d.source, d.target])
+            .data(vis.filteredLink, d => [d.source, d.target])
             .join('line')
             .attr('class', d => `link link-${d.source.id} link-${d.target.id}`)
             .attr('stroke-width', 2)
             .attr('opacity', d => vis.opacityScale(d.value))
             .on('mouseover',(event, d) => {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', true);
-                d3.select('#tooltip')
+                d3.select('#link-tooltip')
                     .style('display', 'block')
                     .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
                     .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
                     .html(`
                       <div class="tooltip-title">${d.target.id} - ${d.source.id}</div>
                       <ul>
-                        <li>Overall Trading Amount: ${d.import_value}</li>
+                        <li>Overall Trading Amount: ${d.value}</li>
                       </ul>
                     `);
             })
             .on('mouseleave',(event, d) => {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', false);
-                d3.select('#tooltip').style('display', 'none');
+                d3.select('#link-tooltip').style('display', 'none');
             });
 
-        vis.patterns.selectAll('pattern').data(vis.data.node).join('pattern')
+        vis.patterns.selectAll('pattern').data(vis.filteredNode).join('pattern')
             .attr('id', d => d.id+"-icon")
             .attr('width', "100%")
             .attr('height', "100%")
@@ -117,7 +185,7 @@ class OverviewGraph {
             .attr("y", 0)
             .attr("preserveAspectRatio", "xMidYMid slice");
 
-        const nodes = vis.nodes.selectAll('.node').data(vis.data.node, d=> d.id)
+        const nodes = vis.nodes.selectAll('.node').data(vis.filteredNode, d=> d.id)
             .join('rect')
             .attr('class', `node`)
             .attr('id', d => `node-${d.id}`)
@@ -128,16 +196,16 @@ class OverviewGraph {
             .call(drag(vis.simulation))
             .on('mouseover', (event, d) => {
                 d3.selectAll('.link-'+d.id).classed('hover', true);
-                d3.select('#relation-tooltip')
+                d3.select('#node-tooltip')
                     .style('display', 'block')
                     .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
                     .style('top', (event.pageY + vis.config.tooltipPadding) + 'px');
-                d3.select("#relation-tooltip-tile").text("asdasdasd");
+                d3.select("#tooltip-content").text(`Number of primary trading partners: ${d.partner_num/2}`)
                 dispatcher.call("updateRelationBarChart", event, d);
             })
             .on('mouseleave', (event, d) => {
                 d3.selectAll('.link-'+d.id).classed('hover', false);
-                d3.select('#tooltip').style('display', 'none');
+                d3.select('#node-tooltip').style('display', 'none');
             })
             .on('click', function (event, d) {
                 const isHighlighted = d3.select(this).classed('highlight');
@@ -156,6 +224,8 @@ class OverviewGraph {
                 .attr('x', d => d.x)
                 .attr('y', d => d.y);
         });
+
+
     }
 }
 
@@ -182,3 +252,4 @@ function drag(simulation) {
         .on("drag", dragged)
         .on("end", dragended);
 }
+

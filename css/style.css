@@ -94,8 +94,7 @@ h1 {
 }
 
 .link:hover,.link.hover,.link.highlight {
-    stroke-width: 2;
-    stroke: black;
+    stroke-width: 4;
 }
 
 .node:hover,.node.hover,.node.highlight {
@@ -103,14 +102,14 @@ h1 {
 }
 
 /* Tooltip */
-.tooltip {
+.tooltip-cus {
     position: absolute;
     display: none;
     background: #fff;
     box-shadow: 3px 3px 3px 0px rgb(92 92 92 / 0.5);
     border: 1px solid #ddd;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     padding: 8px;
     min-width: 160px;
     color: #333;
@@ -120,7 +119,47 @@ h1 {
     font-size: 14px;
     font-weight: 600;
 }
-#tooltip ul {
+.tooltip-cus ul {
     margin: 5px 0 0 0;
     padding-left: 20px;
+}
+
+.Textiles {
+    fill: beige;
+}
+
+.Agriculture {
+    fill:green;
+}
+
+.Stone {
+    fill: grey;
+}
+
+.Minerals {
+    fill: saddlebrown;
+}
+
+.Metals {
+    fill: gold;
+}
+
+.Chemicals {
+    fill: cornflowerblue;
+}
+
+.Vehicles {
+    fill: black;
+}
+
+.Machinery {
+    fill: #842029;
+}
+
+.Electronics {
+    fill: red;
+}
+
+.Other {
+    fill:pink;
 }

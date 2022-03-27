@@ -20,7 +20,9 @@
     <div class="row-container">
         <div class="container">
             <div id="overview"></div>
-            <div id="slider"></div>
+            <div id="year-slider" class="slider"></div>
+            <div id="number-slider" class="slider"></div>
+            <div id="force-slider" class="slider"></div>
             <div id="timeline"></div>
         </div>
     </div>
@@ -46,15 +48,21 @@
         </div>
     </div>
 </div>
-<div id="relation-tooltip" class="tooltip">
-    <div class="tooltip-title"></div>
+
+<div id="node-tooltip" class="tooltip-cus">
+    <div id="tooltip-title"></div>
+    <ul>
+        <li id="tooltip-content"></li>
+    </ul>
     <div class="chart"><svg id="country-bar-chart"></svg></div>
 </div>
 
+<div id="link-tooltip" class="tooltip-cus">
+</div>
+
 <script src="js/lib/d3.v6.min.js"></script>
-<script src="js/lib/d3-simple-slider.min.js"></script>
 <script src="js/lib/topojson.v3.js"></script>
-<script src="js/uiwidgets.js"></script>
+<script src="js/lib/d3-simple-slider.min.js"></script>
 <script src="js/geomap.js"></script>
 <script src="js/scatterplot.js"></script>
 <script src="js/overview.js"></script>

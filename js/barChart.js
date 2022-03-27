@@ -9,7 +9,7 @@ class Barchart {
         // Configuration object with defaults
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 250,
+            containerWidth: _config.containerWidth || 350,
             containerHeight: _config.containerHeight || 230,
             margin: _config.margin || {top: 0, right: 10, bottom: 35, left: 90},
         }
@@ -97,8 +97,8 @@ class Barchart {
             .join('rect');
 
         bars.style('opacity', 1)
-            .attr('class', d => d.region)
-            .attr('strock', 'black')
+            .attr('class', d => data["category"][d[0]])
+            .attr('stroke', 'black')
             .classed('bar', true)
             .attr('y', d => vis.yScale(vis.yValue(d)))
             .attr('height', vis.yScale.bandwidth())

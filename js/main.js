@@ -6,12 +6,13 @@ let selectedTime = 1995; // TODO: Change all selected time range into selected t
 let mode = 'overview'; // overview/ exploration;
 
 // Figures
-let overview, treemap, stackedLineChart, geomap, scatterplot, uiweights, barChart;
+let overview, treemap, stackedLineChart, geomap, scatterplot, barChart;
 //Data
 let data, timeFilteredData;
 
 // Dispatcher
-const dispatcher = d3.dispatch('updateDisplayedCountries', 'updateSelectedCountries', 'updateTime', 'time', "updateRelationBarChart");
+const dispatcher = d3.dispatch('updateDisplayedCountries', 'updateSelectedCountries',
+    'updateTime', 'time', "updateRelationBarChart", 'updateForce');
 
 // Read data
 Promise.all([
@@ -49,15 +50,11 @@ function initViews() {
     barChart = new Barchart({
         parentElement: '#country-bar-chart'
     }, {});
-    // Timeline 
-    uiweights = new UIWidgets({
-        parentElement: '#slider', // Add other three filters here later
-    }, dispatcher);
 
     // Relation graph
     overview = new OverviewGraph({
         parentElement: '#overview',
-    }, timeFilteredData);
+    }, timeFilteredData, barChart, dispatcher);
 
     // Geomap
     // TODO: change merged raw data into rollup force data
@@ -116,8 +113,8 @@ dispatcher.on('updateTime', s => {
     timeFilteredData = data["rollupForceData"][selectedTime];
     console.log(timeFilteredData);
 
-    geomap.value_data = timeFilteredData;
-    geomap.updateVis();
+    // geomap.value_data = timeFilteredData;
+    // geomap.updateVis();
 
     overview.data = timeFilteredData;
     overview.updateVis();
@@ -140,29 +137,10 @@ dispatcher.on('updateRelationBarChart', d=> {
     barChart.data = export_import === "export"? Object.entries(d.export):Object.entries(d.import);
     barChart.updateVis();
 })
-//
-// function filterDataByTimeRange(s) {
-//     const tempTimeFilteredData = d3.filter(Object.entries(data["rollupForceData"]), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
-//     const tempTimeFilteredData2 = data['rawData'].filter(d => ((selectedTimeRange[0] <= parseInt(d.year)) && (parseInt(d.year) <= selectedTimeRange[1])));
-//     return {
-//         "node": d3.rollups(tempTimeFilteredData.map(d => d[1]["node"]).flat(),
-//                     v => { return {
-//                           "id": v[0].id,
-//                           "partner_num": d3.sum(v, e => e.partner_num)}
-//                     }, d => d.id)
-//                   .map(d => d[1]),
-//         "link": d3.groups(tempTimeFilteredData.map(d => d[1]["link"]).flat(), d => d.target, d => d.source)
-//                   .map(d => d[1]).flat()
-//                   .map(d => { return {
-//                         "target": d[1][0].target,
-//                         "source": d[1][0].source,
-//                         "export_value": d3.sum(d[1], e => e.export_value),}
-//                   }),
-//         "export": d3.rollup(tempTimeFilteredData2, v => d3.sum(v, d => d.export_value), d => d.location_code),
-//         "import": d3.rollup(tempTimeFilteredData2, v => d3.sum(v, d => d.import_value), d => d.location_code),
-//     }
-// }
 
+dispatcher.on('updateForce', d => {
+    overview.updateForce(d);
+})
 function updateScatterplot() {
     if (countriesSelected.length == 0) {
         scatterplot.data = [];
