@@ -201,6 +201,7 @@ class OverviewGraph {
                     .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
                     .style('top', (event.pageY + vis.config.tooltipPadding) + 'px');
                 d3.select("#tooltip-content").text(`Number of primary trading partners: ${d.partner_num/2}`)
+                d3.select("#tooltip-title").text(`${d.id}`)
                 dispatcher.call("updateRelationBarChart", event, d);
             })
             .on('mouseleave', (event, d) => {
@@ -224,6 +225,8 @@ class OverviewGraph {
                 .attr('x', d => d.x)
                 .attr('y', d => d.y);
         });
+
+        vis.simulation.restart();
 
 
     }

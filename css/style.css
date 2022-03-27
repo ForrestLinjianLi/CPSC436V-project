@@ -48,14 +48,14 @@
 }
 
 #country-filter {
-    width: 150px;
-    height: 420px;
+    width: 200px;
+    height: 700px;
     overflow: scroll;
 }
 
-/* #out{
+#out{
     background: #f0f3f5;
-} */
+}
 #left {
     float:left;
 }

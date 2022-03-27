@@ -67,16 +67,17 @@ class ChoroplethMap {
   
     updateVis() {
       let vis = this;
-
-      if (vis.export_import == 'export') {
-        vis.c1 = '#cfe2f2';
-        vis.c2 = '#0d306b';
-        vis.data.features.forEach(d => d.properties.value = vis.value_data['export'].get(d.id));
-      } else {
-        vis.c1 = '#f2cfea';
-        vis.c2 = '#b31483';
-        vis.data.features.forEach(d => d.properties.value = vis.value_data['import'].get(d.id));
-      }
+        let indexs = vis.value_data['node'].map(d => d.id);
+        if (vis.export_import == 'export') {
+            vis.c1 = '#cfe2f2';
+            vis.c2 = '#0d306b';
+            vis.data.features.forEach(d => {
+                d.properties.value = indexs.includes(d.id)? d3.sum(Object.entries(vis.value_data['node'][indexs.indexOf(d.id)]['export']), j => j[1]):0});
+        } else {
+            vis.c1 = '#f2cfea';
+            vis.c2 = '#b31483';
+            vis.data.features.forEach(d => d.properties.value = indexs.includes(d.id)? d3.sum(Object.entries(vis.value_data['node'][indexs.indexOf(d.id)]['import']), j => j[1]) :0);
+        }
       
       vis.colorScale = d3.scaleLinear()
         .range([vis.c1, vis.c2])

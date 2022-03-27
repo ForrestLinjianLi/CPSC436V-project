@@ -1,6 +1,6 @@
 // Filters
 let countries = new Set();
-let countriesSelected = [];
+let countriesSelected = ['CAN'];
 let export_import = 'export';
 let selectedTime = 1995; // TODO: Change all selected time range into selected time
 let mode = 'overview'; // overview/ exploration;
@@ -11,9 +11,7 @@ let overview, treemap, stackedLineChart, geomap, scatterplot, barChart;
 let data, timeFilteredData;
 
 // Dispatcher
-const dispatcher = d3.dispatch('updateDisplayedCountries', 'updateSelectedCountries',
-    'updateTime', 'time', "updateRelationBarChart", 'updateForce');
-
+const dispatcher = d3.dispatch('updateTime', "updateRelationBarChart", 'updateForce');
 // Read data
 Promise.all([
     d3.json('data/rollup_force_data.json'),
@@ -50,6 +48,8 @@ function initViews() {
     barChart = new Barchart({
         parentElement: '#country-bar-chart'
     }, {});
+    // Country Checkboxes
+    updateDisplayedCountries();
 
     // Relation graph
     overview = new OverviewGraph({
@@ -57,37 +57,42 @@ function initViews() {
     }, timeFilteredData, barChart, dispatcher);
 
     // Geomap
-    // TODO: change merged raw data into rollup force data
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
         containerWidth: 600
     }, data["world"], timeFilteredData, export_import);
 
     // need to concate location, product, clean_country_partner
-    scatterplot = new Scatterplot({
+    // scatterplot = new Scatterplot({
+    //     parentElement: '#scatter',
+    //     containerWidth: 600
+    // }, data["mergedRawData"]);
+
+    // treeMap
+    treemap = new TreeMap({
         parentElement: '#scatter',
         containerWidth: 600
     }, data["mergedRawData"]);
 
-    // Country Checkboxes
-    dispatcher.call('updateDisplayedCountries');
 }
 
 document.getElementById("btnradio1").addEventListener('click', () => {
-    export_import = 'export'; 
+    export_import = 'export';
+    console.log(export_import);
     updateGeomap();
+    determineMode();
 });
 document.getElementById("btnradio2").addEventListener('click', () => {
-    export_import = 'import'; 
+    export_import = 'import';
+    console.log(export_import);
     updateGeomap();
-});
+    determineMode();});
 
-dispatcher.on('updateDisplayedCountries', () => {
+function updateDisplayedCountries() {
     // Update HTML rendering, then update event listener 
     updateCountryCheckbox().then(
         function (value) {
             const inputs = document.getElementsByClassName("form-check-input");
-            //console.log(inputs);
             for (const input of inputs) {
                 input.addEventListener('click', (event) => {
                     const elem = event.currentTarget;
@@ -97,41 +102,33 @@ dispatcher.on('updateDisplayedCountries', () => {
                     } else {
                         countriesSelected = countriesSelected.filter(d => d != label);
                     }
-                    console.log(label);
-                    console.log(countriesSelected);
+                    //console.log(label);
+                    //console.log(countriesSelected);
                     // console.log(elem.parentNode);
+                    determineMode();
                 });
             }
+            //console.log(countriesSelected);
         }
     )
-});
+};
 
 
 dispatcher.on('updateTime', s => {
+    updateDisplayedCountries();
     selectedTime = s;
-    dispatcher.call('updateDisplayedCountries');
     timeFilteredData = data["rollupForceData"][selectedTime];
     console.log(timeFilteredData);
 
-    // geomap.value_data = timeFilteredData;
-    // geomap.updateVis();
+    geomap.value_data = timeFilteredData;
+    geomap.updateVis();
 
     overview.data = timeFilteredData;
     overview.updateVis();
 
-    updateScatterplot();
-})
+    determineMode();
 
-dispatcher.on('updateSelectedCountries', allSelected => {
-    if (allSelected) {
-        countriesSelected = Array.from(countries).sort();
-    } else {
-        countriesSelected = [];
-    }
-    console.log(countriesSelected);
-    updateScatterplot();
 })
-
 
 dispatcher.on('updateRelationBarChart', d=> {
     barChart.data = export_import === "export"? Object.entries(d.export):Object.entries(d.import);
@@ -141,6 +138,7 @@ dispatcher.on('updateRelationBarChart', d=> {
 dispatcher.on('updateForce', d => {
     overview.updateForce(d);
 })
+
 function updateScatterplot() {
     if (countriesSelected.length == 0) {
         scatterplot.data = [];
@@ -148,7 +146,17 @@ function updateScatterplot() {
         scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
         scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
     }
-    scatterplot.renderVis();
+    scatterplot.updateVis();
+}
+
+function updateTreeMap() {
+    if (countriesSelected.length == 0) {
+        treemap.data = [];
+    } else {
+        treemap.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
+        treemap.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
+    }
+    treemap.updateVis();
 }
 
 function updateGeomap() {
@@ -164,15 +172,18 @@ async function updateCountryCheckbox() {
     console.log(countries);
     const myPromise = new Promise((resolve, reject) => {
         var countryHTML = "";
+        let checked = "";
+        let stillChecked = 0;
         Array.from(countries).sort().forEach(val => {
+            if(countriesSelected.includes(val)) {checked = "checked"; stillChecked += 1;} else {checked = "";};
             countryHTML += `
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`>
             <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
         </div>
     `
         });
-        // console.log(countryHTML);
+        if (stillChecked == 0) uncheckAll();
         resolve(countryHTML);
     })
     myPromise.then(v => {
@@ -182,13 +193,49 @@ async function updateCountryCheckbox() {
     //console.log(document.getElementById("country-filter").innerHTML);
 }
 
-// TODO: Check at most 5 countries
+// Check 5 countries
 function checkAll() {
-    d3.selectAll('.form-check-input').property('checked', true);
-    dispatcher.call('updateSelectedCountries', {}, true);
+    const sel = d3.selectAll('.form-check-input');
+    countriesSelected = [];
+    for (let i = 0; i < 5; i++) {
+        sel._groups[0][i].checked = true;
+        countriesSelected.push(sel._groups[0][i].parentElement.outerText);
+    }
+    console.log(countriesSelected);
+    determineMode();
+
 }
 
+// uncheck to 1 country
 function uncheckAll() {
-    d3.selectAll('.form-check-input').property('checked', false);
-    dispatcher.call('updateSelectedCountries', {}, false);
+    const sel = d3.selectAll('.form-check-input');
+    sel.property('checked', false);
+    sel._groups[0][0].checked = true;
+    countriesSelected = [];
+    countriesSelected.push(sel._groups[0][0].parentElement.outerText);
+    console.log(countriesSelected);
+    determineMode();
+}
+
+function determineMode(){
+    console.log("determine mode...")
+    if(countriesSelected.length == 1) {
+        // exploration mode
+        d3.select("#out").attr("background", "#a7ebbb"); // TODO: Do something to change background color and mode color
+        d3.select("#scatter").html("");
+        document.getElementById('modeTitle').innerHTML = "Exploration Mode";
+        treemap = new TreeMap({
+            parentElement: '#scatter',
+            containerWidth: 600
+        }, data["mergedRawData"]);
+    } else if(countriesSelected.length > 1) {
+        // overview mode
+        d3.select("#out").attr("background", "#f0f3f5"); // TODO: Do something to change background color and mode color
+        d3.select("#scatter").html("");
+        document.getElementById('modeTitle').innerHTML = "Overview Mode";
+        scatterplot = new Scatterplot({
+            parentElement: '#scatter',
+            containerWidth: 600
+        }, data["mergedRawData"]);
+    }
 }

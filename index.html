@@ -14,7 +14,7 @@
 <div id="header-row-container">
     <h1>Global Trading Insight </h1>
     <!-- <span class="placeholder col-5 opacity-0"></span> -->
-    <h1><span class="badge bg-secondary">Exploration Mode</span></h1>
+    <h1><span class="badge bg-secondary" id = "modeTitle">Exploration Mode</span></h1>
 </div>
 <div class="row-container">
     <div class="row-container">
@@ -41,9 +41,9 @@
             <label class="btn btn-outline-primary" for="btnradio2">Import</label>
         </div>
         <div>
-            <h4>Compare Us (At Most 5)</h4>
+            <h5>Leave 1 to explore, or compare up to 5</h5>
             <button type="button" class="btn btn-outline-dark" onclick='checkAll()'>Check 5</button>
-            <button type="button" class="btn btn-outline-secondary" onclick='uncheckAll()'>Uncheck</button>
+            <button type="button" class="btn btn-outline-secondary" onclick='uncheckAll()'>Leave 1</button>
             <div id="country-filter"> </div>
         </div>
     </div>
@@ -65,8 +65,10 @@
 <script src="js/lib/d3-simple-slider.min.js"></script>
 <script src="js/geomap.js"></script>
 <script src="js/scatterplot.js"></script>
+<script src="js/treemap.js"></script>
 <script src="js/overview.js"></script>
 <script src="js/barChart.js"></script>
 <script src="js/main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
 </body>
 </html>
