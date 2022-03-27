@@ -7,9 +7,9 @@ class TreeMap {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 600,
-            containerHeight: 400,
-            margin: {top: 30, right: 20, bottom: 20, left: 55},
+            containerWidth: 800,
+            containerHeight: 450,
+            margin: {top: 40, right: 20, bottom: 20, left: 20},
             tooltipPadding: _config.tooltipPadding || 15
         }
         this.fullData = _data;
@@ -46,10 +46,11 @@ class TreeMap {
         //append title
         vis.svg.append('text')
             .attr('id', 'treeMapTitle')
-            .attr("x", 300)
+            .attr("x", 400)
             .attr("y", 20)
             .attr("text-anchor", "middle")
-            .attr('font-size', '18px')
+            .attr('font-size', '21px')
+            .attr('font-weight', 'bold')
             .text((export_import == "export") ?
                 country + " Export Value Distribution by Product in " + selectedTimeRange[0]
                 : country + " Import Value Distribution by Product in " + selectedTimeRange[0]);
@@ -143,13 +144,13 @@ class TreeMap {
                     <div class="tooltip-title">${country}</div>
                     <ul>
                       <li>Year: ${year}</li>
-                      <li>${d.data.product} ${export_import} value: ${(d.data.export_value/1000000000).toPrecision(4)} Billion USD</li>
+                      <li>${d.data.product} ${export_import} value: ${(d.data.export_value/1000000000).toFixed(4)} Billion USD</li>
                     <ul> 
                     `: `
                     <div class="tooltip-title">${country}</div>
                     <ul>
                       <li>Year: ${year}</li>
-                      <li>${d.data.product} ${export_import} value: ${(d.data.import_value/1000000000).toPrecision(4)} Billion USD</li>
+                      <li>${d.data.product} ${export_import} value: ${(d.data.import_value/1000000000).toFixed(4)} Billion USD</li>
                     <ul> 
                     `);
             })
@@ -166,7 +167,11 @@ class TreeMap {
             .attr("x", function (d) {return d.x0 + 10})    // +10 to adjust position (more right)
             .attr("y", function (d) {return d.y0 + 20})    // +20 to adjust position (lower)
             .text(function (d) {
-                return d.data.product
+                if(d.x1 - d.x0 > 60 && d.y1 - d.y0 > 30) {
+                    return d.data.product;
+                } else {
+                    return null;
+                }
             })
             .attr("font-size", "12px")
             .attr("fill", "white")

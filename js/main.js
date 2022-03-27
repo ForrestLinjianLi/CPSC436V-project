@@ -1,6 +1,6 @@
 // Filters
 let countries = new Set();
-let countriesSelected = ['CAN'];
+let countriesSelected = ['ANS'];
 let export_import = 'export';
 let selectedTimeRange = [1995, 1995];
 let selectedTime = 1995; // TODO: Change all selected time range into selected time
@@ -140,8 +140,6 @@ function updateSelectedCountries(allSelected) {
     console.log(countriesSelected);
     determineMode();
 }
-
-
 
 function filterDataByTimeRange(s) {
     const tempTimeFilteredData = d3.filter(Object.entries(data["rollupForceData"]), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
