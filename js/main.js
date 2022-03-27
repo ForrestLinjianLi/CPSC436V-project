@@ -133,19 +133,6 @@ dispatcher.on('updateTime', s => {
 
 })
 
-<<<<<<< HEAD
-function updateSelectedCountries(allSelected) {
-    if (allSelected) {
-        countriesSelected = Array.from(countries).sort();
-    } else {
-        countriesSelected = [];
-    }
-    console.log(countriesSelected);
-    determineMode();
-}
-=======
-
->>>>>>> 8c8d7ed (country filter selection fix)
 
 function filterDataByTimeRange(s) {
     const tempTimeFilteredData = d3.filter(Object.entries(data["rollupForceData"]), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
