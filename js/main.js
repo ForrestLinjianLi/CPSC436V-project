@@ -93,8 +93,6 @@ function updateDisplayedCountries() {
     updateCountryCheckbox().then(
         function (value) {
             const inputs = document.getElementsByClassName("form-check-input");
-            d3.selectAll('.form-check-input')._groups[0][0].checked  = true;
-            //console.log(inputs);
             for (const input of inputs) {
                 input.addEventListener('click', (event) => {
                     const elem = event.currentTarget;
@@ -110,6 +108,10 @@ function updateDisplayedCountries() {
                     determineMode();
                 });
             }
+            d3.selectAll('.form-check-input')._groups[0][0].checked  = true; // Default set to the first one 
+            countriesSelected = [];
+            countriesSelected.push(inputs[0].parentElement.outerText);
+            console.log(countriesSelected);
         }
     )
 };
@@ -131,6 +133,7 @@ dispatcher.on('updateTime', s => {
 
 })
 
+<<<<<<< HEAD
 function updateSelectedCountries(allSelected) {
     if (allSelected) {
         countriesSelected = Array.from(countries).sort();
@@ -140,6 +143,9 @@ function updateSelectedCountries(allSelected) {
     console.log(countriesSelected);
     determineMode();
 }
+=======
+
+>>>>>>> 8c8d7ed (country filter selection fix)
 
 function filterDataByTimeRange(s) {
     const tempTimeFilteredData = d3.filter(Object.entries(data["rollupForceData"]), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
@@ -216,10 +222,13 @@ async function updateCountryCheckbox() {
 // Check 5 countries
 function checkAll() {
     const sel = d3.selectAll('.form-check-input');
+    countriesSelected = [];
     for (let i = 0; i < 5; i++) {
         sel._groups[0][i].checked = true;
+        countriesSelected.push(sel._groups[0][i].parentElement.outerText);
     }
-    updateSelectedCountries(true);
+    console.log(countriesSelected);
+    determineMode();
     
 }
 
@@ -228,7 +237,9 @@ function uncheckAll() {
     const sel = d3.selectAll('.form-check-input');
     sel.property('checked', false);
     sel._groups[0][0].checked = true;
-    updateSelectedCountries(false);
+    countriesSelected = [];
+    countriesSelected.push(sel._groups[0][0].parentElement.outerText);
+    console.log(countriesSelected);
     determineMode();
 }
 
