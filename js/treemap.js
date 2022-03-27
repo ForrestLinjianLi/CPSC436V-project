@@ -7,7 +7,7 @@ class TreeMap {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 800,
+            containerWidth: 700,
             containerHeight: 450,
             margin: {top: 40, right: 20, bottom: 20, left: 20},
             tooltipPadding: _config.tooltipPadding || 15
@@ -16,6 +16,7 @@ class TreeMap {
         console.log(this.fullData)
 
         this.data = this.fullData.filter(d => countriesSelected.includes(d.location_code));
+        this.data = this.data.filter(d => d.year >= selectedTime && d.year <= selectedTime);
         console.log(this.data);
         this.initVis();
     }
@@ -45,7 +46,7 @@ class TreeMap {
         //append title
         vis.svg.append('text')
             .attr('id', 'treeMapTitle')
-            .attr("x", 400)
+            .attr("x", 350)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .attr('font-size', '21px')
