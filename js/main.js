@@ -12,7 +12,7 @@ let overview, treemap, stackedLineChart, geomap, scatterplot, uiweights;
 let data, timeFilteredData;
 
 // Dispatcher
-const dispatcher = d3.dispatch('updateSelectedCountries', 'updateTime', 'time');
+const dispatcher = d3.dispatch('updateTime');
 
 // Read data
 Promise.all([
@@ -131,7 +131,7 @@ dispatcher.on('updateTime', s => {
 
 })
 
-dispatcher.on('updateSelectedCountries', allSelected => {
+function updateSelectedCountries(allSelected) {
     if (allSelected) {
         countriesSelected = Array.from(countries).sort();
     } else {
@@ -139,7 +139,9 @@ dispatcher.on('updateSelectedCountries', allSelected => {
     }
     console.log(countriesSelected);
     determineMode();
-})
+}
+
+
 
 function filterDataByTimeRange(s) {
     const tempTimeFilteredData = d3.filter(Object.entries(data["rollupForceData"]), d => (parseInt(d[0]) >= selectedTimeRange[0]) && (parseInt(d[0]) <= selectedTimeRange[1]));
@@ -214,9 +216,16 @@ async function updateCountryCheckbox() {
     //console.log(document.getElementById("country-filter").innerHTML);
 }
 
+// TODO: Check at most 5 countries
+// function checkAll() {
+//     d3.selectAll('.form-check-input').property('checked', true);
+//     updateSelectedCountries(true);
+    
+// }
+
 function uncheckAll() {
     d3.selectAll('.form-check-input').property('checked', false);
-    dispatcher.call('updateSelectedCountries', {}, false);
+    updateSelectedCountries(false);
     determineMode();
 }
 
