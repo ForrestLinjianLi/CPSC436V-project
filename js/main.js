@@ -12,7 +12,7 @@ let overview, treemap, stackedLineChart, geomap, scatterplot, uiweights;
 let data, timeFilteredData;
 
 // Dispatcher
-const dispatcher = d3.dispatch('updateDisplayedCountries', 'updateSelectedCountries', 'updateTime', 'time');
+const dispatcher = d3.dispatch('updateSelectedCountries', 'updateTime', 'time');
 
 // Read data
 Promise.all([
@@ -44,7 +44,7 @@ Promise.all([
 
 function initViews() {
     // Country Checkboxes
-    dispatcher.call('updateDisplayedCountries');
+    updateDisplayedCountries();
 
     // Timeline 
     uiweights = new UIWidgets({
@@ -89,7 +89,7 @@ document.getElementById("btnradio2").addEventListener('click', () => {
     updateGeomap();
     determineMode();});
 
-dispatcher.on('updateDisplayedCountries', () => {
+function updateDisplayedCountries() {
     // Update HTML rendering, then update event listener 
     updateCountryCheckbox().then(
         function (value) {
@@ -112,12 +112,12 @@ dispatcher.on('updateDisplayedCountries', () => {
             }
         }
     )
-});
+};
 
 
 dispatcher.on('updateTime', s => {
     selectedTimeRange = s;
-    dispatcher.call('updateDisplayedCountries');
+    updateDisplayedCountries();
     timeFilteredData = filterDataByTimeRange(s);
     console.log(timeFilteredData);
 
