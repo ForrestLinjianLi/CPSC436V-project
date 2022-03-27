@@ -53,9 +53,9 @@
     overflow: scroll;
 }
 
-/* #out{
+#out{
     background: #f0f3f5;
-} */
+}
 #left {
     float:left;
 }

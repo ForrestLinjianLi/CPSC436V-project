@@ -1,6 +1,6 @@
 // Filters
 let countries = new Set();
-let countriesSelected = ['ANS'];
+let countriesSelected = ['CAN'];
 let export_import = 'export';
 let selectedTimeRange = [1995, 1995];
 let selectedTime = 1995; // TODO: Change all selected time range into selected time
@@ -102,16 +102,13 @@ function updateDisplayedCountries() {
                     } else {
                         countriesSelected = countriesSelected.filter(d => d != label);
                     }
-                    console.log(label);
-                    console.log(countriesSelected);
+                    //console.log(label);
+                    //console.log(countriesSelected);
                     // console.log(elem.parentNode);
                     determineMode();
                 });
             }
-            d3.selectAll('.form-check-input')._groups[0][0].checked  = true; // Default set to the first one 
-            countriesSelected = [];
-            countriesSelected.push(inputs[0].parentElement.outerText);
-            console.log(countriesSelected);
+            //console.log(countriesSelected);
         }
     )
 };
@@ -189,14 +186,18 @@ async function updateCountryCheckbox() {
     console.log(countries);
     const myPromise = new Promise((resolve, reject) => {
         var countryHTML = "";
+        let checked = "";
+        let stillChecked = 0;
         Array.from(countries).sort().forEach(val => {
+            if(countriesSelected.includes(val)) {checked = "checked"; stillChecked += 1;} else {checked = "";};
             countryHTML += `
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`>
             <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
         </div>
     `
         });
+        if (stillChecked == 0) uncheckAll();
         resolve(countryHTML);
     })
     myPromise.then(v => {
@@ -234,6 +235,7 @@ function determineMode(){
     console.log("determine mode...")
     if(countriesSelected.length == 1) {
         // exploration mode
+        d3.select("#out").attr("background", "#a7ebbb"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");
         document.getElementById('modeTitle').innerHTML = "Exploration Mode";
         treemap = new TreeMap({
@@ -242,6 +244,7 @@ function determineMode(){
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
+        d3.select("#out").attr("background", "#f0f3f5"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");
         document.getElementById('modeTitle').innerHTML = "Overview Mode";
         scatterplot = new Scatterplot({
