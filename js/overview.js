@@ -7,7 +7,7 @@ class OverviewGraph {
     constructor(_config, _data, _barChart, _dispatcher) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 800,
+            containerWidth: 600,
             containerHeight: 600,
             margin: {top: 25, right: 20, bottom: 20, left: 20},
             tooltipPadding: _config.tooltipPadding || 15,
@@ -98,24 +98,24 @@ class OverviewGraph {
 
         d3.select('#year-slider')
             .append('svg')
-            .attr('width', 600)
-            .attr('height', 80)
+            .attr('width', vis.config.width)
+            .attr('height', 70)
             .append('g')
             .attr('transform', `translate(30, 15)`)
             .call(yearSlider);
 
         d3.select('#number-slider')
             .append('svg')
-            .attr('width', 600)
-            .attr('height', 80)
+            .attr('width', vis.config.width)
+            .attr('height', 70)
             .append('g')
             .attr('transform', `translate(30, 15)`)
             .call(numberSlider);
 
         d3.select('#force-slider')
             .append('svg')
-            .attr('width', 600)
-            .attr('height', 80)
+            .attr('width', vis.config.width)
+            .attr('height', 70)
             .append('g')
             .attr('transform', `translate(30,15)`)
             .call(forceSlider);
@@ -225,10 +225,7 @@ class OverviewGraph {
                 .attr('x', d => d.x)
                 .attr('y', d => d.y);
         });
-
         vis.simulation.restart();
-
-
     }
 }
 
