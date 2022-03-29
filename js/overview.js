@@ -33,7 +33,7 @@ class OverviewGraph {
         // Initialize scales
         vis.opacityScale = d3.scaleLinear().range([0.1,1]);
         vis.lengthScale = d3.scaleLinear()
-            .range([10, 50]);
+            .range([20, 70]);
         vis.radiusScale = d3.scaleLinear()
             .domain([40, 100])
             .range([50, 30])
@@ -198,13 +198,13 @@ class OverviewGraph {
             .attr("preserveAspectRatio", "xMidYMid slice");
 
         const nodes = vis.nodes.selectAll('.node').data(vis.filteredNode, d=> d.id)
-            .join('rect')
+            .join('circle')
             .attr('class', `node`)
             .attr('id', d => `node-${d.id}`)
             .attr("fill", d => `url(#${d.id}-icon)`)
             .attr('stroke', 'black')
-            .attr('width', d => vis.lengthScale(d.partner_num))
-            .attr('height', d=> vis.lengthScale(d.partner_num))
+            .attr('r', d => vis.lengthScale(d.partner_num)/2)
+            // .attr('ry', d=> vis.lengthScale(d.partner_num))
             .call(drag(vis.simulation))
             .on('mouseover', (event, d) => {
                 d3.selectAll('.link-'+d.id).classed('hover', true);
@@ -234,8 +234,8 @@ class OverviewGraph {
                 .attr('y2', d => d.target.y);
 
             nodes
-                .attr('x', d => d.x)
-                .attr('y', d => d.y);
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y);
         });
         vis.simulation.restart();
     }
