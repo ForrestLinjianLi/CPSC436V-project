@@ -101,6 +101,8 @@ h1 {
     stroke-width: 4;
 }
 
+
+
 /* Tooltip */
 .tooltip-cus {
     position: absolute;
@@ -122,6 +124,12 @@ h1 {
 .tooltip-cus ul {
     margin: 5px 0 0 0;
     padding-left: 20px;
+}
+
+.slider-title {
+    height: 3px;
+    padding: 1px;
+    font-weight: bolder;
 }
 
 .Textiles {

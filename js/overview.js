@@ -8,10 +8,11 @@ class OverviewGraph {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: 600,
-            containerHeight: 600,
+            containerHeight: 800,
             margin: {top: 25, right: 20, bottom: 20, left: 20},
             tooltipPadding: _config.tooltipPadding || 15,
-            maxNode: 20
+            maxNode: 30,
+            defaultForce: 1000,
         }
         this.data = _data;
         this.barChart = _barChart;
@@ -53,53 +54,62 @@ class OverviewGraph {
         // Initialize force simulation
         vis.simulation = d3.forceSimulation()
             .force('link', d3.forceLink().id(d => d.id))
-            .force('charge', d3.forceManyBody().strength(-40))
+            .force('charge', d3.forceManyBody().strength(vis.config.defaultForce))
             .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2));
 
         vis.patterns = vis.chart.append('defs');
         let yearSlider = d3
-            .sliderHorizontal()
+            .sliderBottom()
             .domain([1995, 2017])
+            .default(selectedTime)
             .tickFormat(d => d + "")
             .ticks(10)
             .width(500)
             .step(1)
-            .displayValue(false)
+            // .displayValue(false)
             .on('onchange', (val) => {
                 vis.dispatcher.call('updateTime', {}, parseInt(val));
             });
 
-        let numberSlider = d3
-            .sliderHorizontal()
-            .domain([1,40])
-            .ticks(23)
+        vis.numberSlider = d3
+            .sliderBottom()
+            .domain([1,vis.config.maxNode])
             .width(500)
             .step(1)
-            .displayValue(false)
+            .default(vis.config.maxNode)
+            // .displayValue(false)
             .on('onchange', (val) => {
                 vis.config.maxNode = val;
                 vis.updateVis();
             });
 
         let forceSlider = d3
-            .sliderHorizontal()
-            .domain([0, 2000])
+            .sliderBottom()
+            .domain([0, 1000])
             .ticks(10)
             .width(500)
             .step(100)
-            .displayValue(false)
+            // .displayValue(false)
+            .default(vis.config.defaultForce)
             .on('onchange', (val) => {
                 let vis = this;
                 vis.simulation.force('charge', d3.forceManyBody()
-                    .strength(-val))
+                    .strength(val))
                     .restart();
             });
 
+        vis.svg.append('text')
+            .attr('id', 'relation-graph-title')
+            .attr("x", vis.config.width/2)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .attr('font-size', '21px')
+            .attr('font-weight', 'bold')
 
         d3.select('#year-slider')
             .append('svg')
             .attr('width', vis.config.width)
-            .attr('height', 70)
+            .attr('height', 50)
             .append('g')
             .attr('transform', `translate(30, 15)`)
             .call(yearSlider);
@@ -107,18 +117,19 @@ class OverviewGraph {
         d3.select('#number-slider')
             .append('svg')
             .attr('width', vis.config.width)
-            .attr('height', 70)
+            .attr('height', 50)
             .append('g')
             .attr('transform', `translate(30, 15)`)
-            .call(numberSlider);
+            .call(vis.numberSlider);
 
         d3.select('#force-slider')
             .append('svg')
             .attr('width', vis.config.width)
-            .attr('height', 70)
+            .attr('height', 50)
             .append('g')
             .attr('transform', `translate(30,15)`)
             .call(forceSlider);
+
         vis.updateVis();
     }
 
@@ -136,6 +147,7 @@ class OverviewGraph {
         vis.simulation.nodes(vis.filteredNode);
         vis.simulation.force('link').links(vis.filteredLink).distance(100);
         vis.simulation.force('collide',d3.forceCollide().radius(vis.radiusScale(vis.data.node.length)).iterations(2));
+        d3.select("#relation-graph-title").text(`The Primary Trading Countries in ${selectedTime}`);
         vis.renderVis();
     }
 
@@ -144,7 +156,7 @@ class OverviewGraph {
      */
     renderVis() {
         let vis = this;
-
+        vis.svg.append('p').attr('id', '').text(`The Primary Trading Countries in ${selectedTime}`)
         // Add links
         const links = vis.links.selectAll('.link')
             .data(vis.filteredLink, d => [d.source, d.target])

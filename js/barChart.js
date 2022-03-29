@@ -66,6 +66,7 @@ class Barchart {
             .attr('y', vis.height + 30)
             .attr('x', vis.width)
             .style('text-anchor', 'end')
+            .text("billion USD")
     }
 
     /**
@@ -76,12 +77,11 @@ class Barchart {
 
         // Specify accessor functions
         vis.yValue = d => data["category"][d[0]];
-        vis.xValue = d => d[1];
+        vis.xValue = d => d[1]/1000000000;
 
         // Set the scale input domajs
         vis.yScale.domain(vis.data.map(vis.yValue));
         vis.xScale.domain([0, d3.max(vis.data, vis.xValue)]);
-
         vis.renderVis();
     }
 
@@ -102,7 +102,7 @@ class Barchart {
             .classed('bar', true)
             .attr('y', d => vis.yScale(vis.yValue(d)))
             .attr('height', vis.yScale.bandwidth())
-            .attr('width', d => Math.max(vis.xScale(vis.xValue(d)) - 1, 0))
+            .attr('width', d => Math.max(vis.xScale(vis.xValue(d)), 0))
             .attr('x', 1);
 
         // Update axes

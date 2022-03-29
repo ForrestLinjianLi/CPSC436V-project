@@ -6,18 +6,19 @@ let selectedTime = 1995; // TODO: Change all selected time range into selected t
 let mode = 'overview'; // overview/ exploration;
 
 // Figures
-let overview, treemap, stackedLineChart, geomap, scatterplot, barChart;
+let overview, treemap, geomap, scatterplot, barChart;
 //Data
 let data, timeFilteredData;
 
 // Dispatcher
 const dispatcher = d3.dispatch('updateTime', "updateRelationBarChart", 'updateForce');
-// Read data
+
+// Load data
 Promise.all([
-    d3.json('data/rollup_force_data.json'),
+    d3.json('data/node_link.json'),
     d3.json('data/world.json'),
     d3.csv('data/clean_country_partner_hsproductsection_year.csv'),
-    d3.csv('data/merge.csv'),
+    d3.csv('data/year_country_product.csv'),
     d3.csv('data/hs_product.csv')
 ]).then(_data => {
     data = {
@@ -42,6 +43,7 @@ Promise.all([
     data["category"] = data["category"].map(d => d.hs_product_name_short_en);
 
     initViews();
+    initDispatchers();
 })
 
 function initViews() {
@@ -62,34 +64,55 @@ function initViews() {
         containerWidth: 600
     }, data["world"], timeFilteredData, export_import);
 
-    // need to concate location, product, clean_country_partner
-    // scatterplot = new Scatterplot({
-    //     parentElement: '#scatter',
-    //     containerWidth: 600
-    // }, data["mergedRawData"]);
-
     // treeMap
     treemap = new TreeMap({
         parentElement: '#scatter',
         containerWidth: 600
     }, data["mergedRawData"]);
 
+    // init scatterplot/tree map based on mode
+    determineMode()
+
+    // add button listeners
+    document.getElementById("btnradio1").addEventListener('click', () => {
+        export_import = 'export';
+        console.log(export_import);
+        updateGeomap();
+        determineMode();
+    });
+    document.getElementById("btnradio2").addEventListener('click', () => {
+        export_import = 'import';
+        console.log(export_import);
+        updateGeomap();
+        determineMode();});
 }
 
-document.getElementById("btnradio1").addEventListener('click', () => {
-    export_import = 'export';
-    console.log(export_import);
-    updateGeomap();
-    determineMode();
-});
-document.getElementById("btnradio2").addEventListener('click', () => {
-    export_import = 'import';
-    console.log(export_import);
-    updateGeomap();
-    determineMode();});
+
+function initDispatchers() {
+    dispatcher.on('updateTime', s => {
+        updateDisplayedCountries();
+        selectedTime = s;
+        timeFilteredData = data["rollupForceData"][selectedTime];
+        console.log(timeFilteredData);
+
+        geomap.value_data = timeFilteredData;
+        geomap.updateVis();
+
+        overview.data = timeFilteredData;
+        overview.updateVis();
+
+        determineMode();
+    })
+
+    dispatcher.on('updateRelationBarChart', d=> {
+        barChart.data = export_import === "export"? Object.entries(d.export):Object.entries(d.import);
+        barChart.updateVis();
+    })
+}
+
 
 function updateDisplayedCountries() {
-    // Update HTML rendering, then update event listener 
+    // Update HTML rendering, then update event listener
     updateCountryCheckbox().then(
         function (value) {
             const inputs = document.getElementsByClassName("form-check-input");
@@ -111,53 +134,8 @@ function updateDisplayedCountries() {
             //console.log(countriesSelected);
         }
     )
-};
-
-
-dispatcher.on('updateTime', s => {
-    updateDisplayedCountries();
-    selectedTime = s;
-    timeFilteredData = data["rollupForceData"][selectedTime];
-    console.log(timeFilteredData);
-
-    geomap.value_data = timeFilteredData;
-    geomap.updateVis();
-
-    overview.data = timeFilteredData;
-    overview.updateVis();
-
-    determineMode();
-
-})
-
-dispatcher.on('updateRelationBarChart', d=> {
-    barChart.data = export_import === "export"? Object.entries(d.export):Object.entries(d.import);
-    barChart.updateVis();
-})
-
-dispatcher.on('updateForce', d => {
-    overview.updateForce(d);
-})
-
-function updateScatterplot() {
-    if (countriesSelected.length == 0) {
-        scatterplot.data = [];
-    } else {
-        scatterplot.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
-        scatterplot.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
-    }
-    scatterplot.updateVis();
 }
 
-function updateTreeMap() {
-    if (countriesSelected.length == 0) {
-        treemap.data = [];
-    } else {
-        treemap.data = scatterplot.fullData.filter(d => countriesSelected.includes(d.location_code));
-        treemap.data = scatterplot.data.filter(d => d.year >= selectedTimeRange[0] && d.year <= selectedTimeRange[1]);
-    }
-    treemap.updateVis();
-}
 
 function updateGeomap() {
     geomap.export_import = export_import;
@@ -189,8 +167,6 @@ async function updateCountryCheckbox() {
     myPromise.then(v => {
         document.getElementById("country-filter").innerHTML = v;
     })
-    //.then(() => console.log(document.getElementById("country-filter").innerHTML));
-    //console.log(document.getElementById("country-filter").innerHTML);
 }
 
 // Check 5 countries

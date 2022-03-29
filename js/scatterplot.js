@@ -126,7 +126,11 @@ class Scatterplot {
         vis.colorLegend = d3.legendColor()
             .scale(vis.countryColorScale)
             .shape('circle')
-            .title("Countries");
+            .title("Countries")
+            // .classPrefix(d => `point-${d.location_code}`)
+            .on("cellover", (d) => {
+                console.log(d);
+            });
         console.log(vis.colorLegend)
         vis.renderVis();
     }
@@ -141,12 +145,13 @@ class Scatterplot {
         const circles = vis.chart.selectAll('.point')
             .data(vis.data, (export_import == "export") ? d => d.export_value:d => d.import_value)
             .join('circle')
-            .attr('class', 'point')
+            .attr('class', d => `point point-${d.location_code}`)
             .attr('r', '8px')  // circle 8px
             .attr('cy', d => vis.yScale(vis.yValue(d)))
             .attr('cx', d => vis.xScale(vis.xValue(d)))
             .attr("opacity","0.7") // circle 8px
             .attr('fill', d => vis.countryColorScale(vis.colorValue(d)))
+            .attr('stroke', 'black')
             .on("mouseover", (event, d) => {
                 // tooltip
                 d3.select("#tooltip")
@@ -169,9 +174,11 @@ class Scatterplot {
                       <li>${d.product} ${export_import} value: ${(d.import_value/1000000000).toFixed(2)} Billion USD</li>
                     <ul> 
                   `);
+                d3.selectAll(`.point-${d.location_code}`).style('stroke-width', 5);
             })
-            .on("mouseout", () => {
+            .on("mouseleave", (event, d) => {
                 d3.select('#tooltip').style('display', 'none');
+                d3.selectAll(`.point-${d.location_code}`).style('stroke-width', 1);
             })
 
         // Update the axes
@@ -183,8 +190,8 @@ class Scatterplot {
             .call(vis.yAxis)
             .call(g => g.select('.domain').remove());
 
-        vis.colorLegendG.call(vis.colorLegend)
-            .selectAll('.cell text')
+        let legendg = vis.colorLegendG.call(vis.colorLegend);
+        legendg.selectAll('.cell text')
             .attr('dy', '0.1em')
             .attr("font-size", "12px");
     }
