@@ -91,6 +91,7 @@ function initViews() {
     // add button listeners
     document.getElementById("btnradio1").addEventListener('click', () => {
         export_import = 'export';
+        console.log(this);
         updateGeomap();
         determineMode();
     });
