@@ -4,6 +4,11 @@ let countriesSelected = ['CAN'];
 let export_import = 'export';
 let selectedTime = 1995; // TODO: Change all selected time range into selected time
 let mode = 'overview'; // overview/ exploration;
+let id2name = {};
+let name2id = {};
+
+// Remark: If you want to use country name instead of id, use the following function:
+// countriesSelected.map(d => id2name[d]);
 
 // Figures
 let overview, treemap, geomap, scatterplot, barChart;
@@ -19,15 +24,24 @@ Promise.all([
     d3.json('data/world.json'),
     d3.csv('data/clean_country_partner_hsproductsection_year.csv'),
     d3.csv('data/year_country_product.csv'),
-    d3.csv('data/hs_product.csv')
+    d3.csv('data/hs_product.csv'),
+    d3.csv('data/location.csv')
 ]).then(_data => {
     data = {
         'rollupForceData': _data[0],
         'world': _data[1],
         'rawData': _data[2],
         'mergedRawData': _data[3],
-        'category': _data[4]
+        'category': _data[4],
+        'countryMap': _data[5]
     }
+
+    console.log(data["countryMap"]);
+    data['countryMap'].forEach(d => {
+        id2name[d.location_code] = d.location_name_short_en;
+        name2id[d.location_name_short_en] = d.location_code
+    });
+
     timeFilteredData = data["rollupForceData"][selectedTime];
 
     console.log(timeFilteredData);
