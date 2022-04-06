@@ -1,6 +1,7 @@
 // Filters
 let countries = new Set();
 let countriesSelected = ['CAN'];
+let coutnriesSelectedName = ['Canada'];
 let export_import = 'export';
 let selectedTime = 1995; // TODO: Change all selected time range into selected time
 let mode = 'overview'; // overview/ exploration;
@@ -39,7 +40,7 @@ Promise.all([
     console.log(data["countryMap"]);
     data['countryMap'].forEach(d => {
         id2name[d.location_code] = d.location_name_short_en;
-        name2id[d.location_name_short_en] = d.location_code
+        name2id[d.location_name_short_en] = d.location_code;
     });
 
     timeFilteredData = data["rollupForceData"][selectedTime];
@@ -135,9 +136,11 @@ function updateDisplayedCountries() {
                     const elem = event.currentTarget;
                     const label = elem.parentNode.outerText;
                     if (elem.checked) {
-                        countriesSelected.push(label);
+                        coutnriesSelectedName.push(label);
+                        countriesSelected.push(name2id[label]);
                     } else {
-                        countriesSelected = countriesSelected.filter(d => d != label);
+                        coutnriesSelectedName = coutnriesSelectedName.filter(d => d != label);
+                        countriesSelected = countriesSelected.filter(d => d != name2id[label]);
                     }
                     //console.log(label);
                     //console.log(countriesSelected);
@@ -171,7 +174,7 @@ async function updateCountryCheckbox() {
             countryHTML += `
         <div class="form-check">
             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`>
-            <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
+            <label class="form-check-label" for="flexCheckDefault">` + id2name[val] + ` </label>
         </div>
     `
         });
@@ -186,10 +189,11 @@ async function updateCountryCheckbox() {
 // Check 5 countries
 function checkAll() {
     const sel = d3.selectAll('.form-check-input');
-    countriesSelected = [];
+    countriesSelectedName = [];
     for (let i = 0; i < 5; i++) {
         sel._groups[0][i].checked = true;
-        countriesSelected.push(sel._groups[0][i].parentElement.outerText);
+        countriesSelectedName.push(sel._groups[0][i].parentElement.outerText);
+        countriesSelected = countriesSelectedName.map(d => name2id[d]);
     }
     console.log(countriesSelected);
     determineMode();
@@ -201,8 +205,9 @@ function uncheckAll() {
     const sel = d3.selectAll('.form-check-input');
     sel.property('checked', false);
     sel._groups[0][0].checked = true;
-    countriesSelected = [];
-    countriesSelected.push(sel._groups[0][0].parentElement.outerText);
+    countriesSelectedName = [];
+    countriesSelectedName.push(sel._groups[0][0].parentElement.outerText);
+    countriesSelected = countriesSelectedName.map(d => name2id[d]);
     console.log(countriesSelected);
     determineMode();
 }
