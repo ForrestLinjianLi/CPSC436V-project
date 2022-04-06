@@ -177,8 +177,10 @@ class ChoroplethMap {
           .on('click', (event, d) => {
             if(vis.selected_country_name.includes(d.properties.name)){
               vis.selected_country_name = vis.selected_country_name.filter(item => item!= d.properties.name);
-            } else {
+            } else if (vis.value_data['node'].map(item => item.id).includes(d.id)){
               vis.selected_country_name.push(d.properties.name);
+            } else {
+              return;
             }
             vis.chart.selectAll('.country')
                 .data(countries.features)

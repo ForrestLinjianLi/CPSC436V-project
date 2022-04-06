@@ -91,15 +91,14 @@ function initViews() {
     // add button listeners
     document.getElementById("btnradio1").addEventListener('click', () => {
         export_import = 'export';
-        console.log(export_import);
         updateGeomap();
         determineMode();
     });
     document.getElementById("btnradio2").addEventListener('click', () => {
         export_import = 'import';
-        console.log(export_import);
         updateGeomap();
-        determineMode();});
+        determineMode();
+    });
 }
 
 
@@ -117,12 +116,10 @@ function initDispatchers() {
         timeFilteredData = data["rollupForceData"][selectedTime];
         console.log(timeFilteredData);
 
-        geomap.value_data = timeFilteredData;
-        geomap.updateVis();
-
         overview.data = timeFilteredData;
         overview.updateVis();
 
+        updateGeomap();
         determineMode();
     })
 
@@ -150,8 +147,9 @@ function updateDisplayedCountries() {
                         countriesSelected = countriesSelected.filter(d => d != name2id[label]);
                     }
                     //console.log(label);
-                    //console.log(countriesSelected);
+                    //console.log(countriesSelectedName);
                     // console.log(elem.parentNode);
+                    updateGeomap();
                     determineMode();
                 });
             }
@@ -163,6 +161,8 @@ function updateDisplayedCountries() {
 
 function updateGeomap() {
     geomap.export_import = export_import;
+    geomap.selected_country_name = countriesSelectedName;
+    geomap.value_data = timeFilteredData;
     geomap.updateVis();
 }
 
@@ -202,8 +202,9 @@ function checkAll() {
         countriesSelectedName.push(sel._groups[0][i].parentElement.outerText);
         countriesSelected = countriesSelectedName.map(d => name2id[d]);
     }
-    console.log(countriesSelected);
+    updateGeomap();
     determineMode();
+
 
 }
 
@@ -215,7 +216,7 @@ function uncheckAll() {
     countriesSelectedName = [];
     countriesSelectedName.push(sel._groups[0][0].parentElement.outerText);
     countriesSelected = countriesSelectedName.map(d => name2id[d]);
-    console.log(countriesSelected);
+    updateGeomap();
     determineMode();
 }
 
