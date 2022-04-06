@@ -3,7 +3,7 @@ let countries = new Set();
 let countriesSelected = ['CAN'];
 let countriesSelectedName = ['Canada'];
 let export_import = 'export';
-let selectedTime = 1995; // TODO: Change all selected time range into selected time
+let selectedTime = 1995; 
 let mode = 'overview'; // overview/ exploration;
 let id2name = {};
 let name2id = {};
@@ -77,7 +77,7 @@ function initViews() {
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
         containerWidth: 600
-    }, data["world"], timeFilteredData, export_import, countriesSelectedName, dispatcher);
+    }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
     // treeMap
     treemap = new TreeMap({
@@ -103,10 +103,10 @@ function initViews() {
 
 
 function initDispatchers() {
-    dispatcher.on('updateCountry', countries => {
-        console.log(countries);
-        countriesSelectedName = countries;
-        countriesSelected = countriesSelectedName.map(d => name2id[d]);
+    dispatcher.on('updateCountry', countries_id => {
+        console.log(countries_id);
+        countriesSelected = countries_id;
+        countriesSelectedName = countriesSelected.map(d => id2name[d]);
         updateDisplayedCountries();
     });
 

@@ -5,7 +5,7 @@ class ChoroplethMap {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _world_data, _value_data, _export_import, _selected_country_name, _dispatcher) {
+    constructor(_config, _world_data, _value_data, _export_import, _selected_country_id, _dispatcher) {
       this.config = {
         parentElement: _config.parentElement,
         containerWidth: _config.containerWidth || 1000,
@@ -20,7 +20,7 @@ class ChoroplethMap {
       this.data = _world_data;
       this.value_data = _value_data;
       this.export_import = _export_import;
-      this.selected_country_name = _selected_country_name;
+      this.selected_country_id = _selected_country_id;
       this.dispatcher = _dispatcher;
       this.initVis();
     }
@@ -119,7 +119,7 @@ class ChoroplethMap {
         .join('path')
           .attr('class', 'country')
           .attr('d', vis.geoPath)
-          .attr('stroke', d => vis.selected_country_name.includes(d.properties.name) ? "#333": "none")
+          .attr('stroke', d => vis.selected_country_id.includes(d.id) ? "#333": "none")
           .attr('fill', d => {
             if (d.properties.value) {
               //console.log(d.properties.export_value);
@@ -175,18 +175,18 @@ class ChoroplethMap {
       // Bidirectional linked global country filters
       countryPath
           .on('click', (event, d) => {
-            if(vis.selected_country_name.includes(d.properties.name)){
-              vis.selected_country_name = vis.selected_country_name.filter(item => item!= d.properties.name);
+            if(vis.selected_country_id.includes(d.id)){
+              vis.selected_country_id = vis.selected_country_id.filter(item => item!= d.id);
             } else if (vis.value_data['node'].map(item => item.id).includes(d.id)){
-              vis.selected_country_name.push(d.properties.name);
+              vis.selected_country_id.push(d.id);
             } else {
               return;
             }
             vis.chart.selectAll('.country')
                 .data(countries.features)
               .join('path')
-                .attr('stroke', d => vis.selected_country_name.includes(d.properties.name) ? "#333": "none")
-            vis.dispatcher.call('updateCountry', event, vis.selected_country_name);
+                .attr('stroke', d => vis.selected_country_id.includes(d.id) ? "#333": "none")
+            vis.dispatcher.call('updateCountry', event, vis.selected_country_id);
           });
 
       // Add legend labels
