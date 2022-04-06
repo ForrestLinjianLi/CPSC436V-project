@@ -18,25 +18,19 @@
     width: 100%;
 }
 
-.container {
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
+#header-row-container h1 {
+    padding-left: 80px;
 }
 
-.row-container {
-    position: relative;
-    margin: 10px;
-    align-content: start;
-    display: inline-flex;
-    left:10px;
+.row {
+    padding: 10px;
 }
 
 #filter-container {
+    width: 100%;
     display: flex;
     flex-direction: column;
     margin: 20px;
-    width: 15%;
     padding: 10px;
     border: 2px solid #ddd;
     border-radius: 10px;
@@ -48,8 +42,7 @@
 }
 
 #country-filter {
-    width: 200px;
-    height: 700px;
+    width: 100%;
     overflow: scroll;
 }
 
