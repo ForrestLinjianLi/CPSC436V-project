@@ -1,7 +1,7 @@
 // Filters
 let countries = new Set();
 let countriesSelected = ['CAN'];
-let coutnriesSelectedName = ['Canada'];
+let countriesSelectedName = ['Canada'];
 let export_import = 'export';
 let selectedTime = 1995; // TODO: Change all selected time range into selected time
 let mode = 'overview'; // overview/ exploration;
@@ -17,7 +17,7 @@ let overview, treemap, geomap, scatterplot, barChart;
 let data, timeFilteredData;
 
 // Dispatcher
-const dispatcher = d3.dispatch('updateTime', "updateRelationBarChart", 'updateForce');
+const dispatcher = d3.dispatch('updateCountry', 'updateTime', "updateRelationBarChart", 'updateForce');
 
 // Load data
 Promise.all([
@@ -77,7 +77,7 @@ function initViews() {
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
         containerWidth: 600
-    }, data["world"], timeFilteredData, export_import);
+    }, data["world"], timeFilteredData, export_import, countriesSelectedName, dispatcher);
 
     // treeMap
     treemap = new TreeMap({
@@ -104,6 +104,13 @@ function initViews() {
 
 
 function initDispatchers() {
+    dispatcher.on('updateCountry', countries => {
+        console.log(countries);
+        countriesSelectedName = countries;
+        countriesSelected = countriesSelectedName.map(d => name2id[d]);
+        updateDisplayedCountries();
+    });
+
     dispatcher.on('updateTime', s => {
         updateDisplayedCountries();
         selectedTime = s;
@@ -136,10 +143,10 @@ function updateDisplayedCountries() {
                     const elem = event.currentTarget;
                     const label = elem.parentNode.outerText;
                     if (elem.checked) {
-                        coutnriesSelectedName.push(label);
+                        countriesSelectedName.push(label);
                         countriesSelected.push(name2id[label]);
                     } else {
-                        coutnriesSelectedName = coutnriesSelectedName.filter(d => d != label);
+                        countriesSelectedName = countriesSelectedName.filter(d => d != label);
                         countriesSelected = countriesSelected.filter(d => d != name2id[label]);
                     }
                     //console.log(label);

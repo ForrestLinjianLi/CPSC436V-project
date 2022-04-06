@@ -5,7 +5,7 @@ class ChoroplethMap {
      * @param {Object}
      * @param {Array}
      */
-    constructor(_config, _world_data, _value_data, _export_import) {
+    constructor(_config, _world_data, _value_data, _export_import, _selected_country_name, _dispatcher) {
       this.config = {
         parentElement: _config.parentElement,
         containerWidth: _config.containerWidth || 1000,
@@ -20,6 +20,8 @@ class ChoroplethMap {
       this.data = _world_data;
       this.value_data = _value_data;
       this.export_import = _export_import;
+      this.selected_country_name = _selected_country_name;
+      this.dispatcher = _dispatcher;
       this.initVis();
     }
     
@@ -117,6 +119,7 @@ class ChoroplethMap {
         .join('path')
           .attr('class', 'country')
           .attr('d', vis.geoPath)
+          .attr('stroke', d => vis.selected_country_name.includes(d.properties.name) ? "#333": "none")
           .attr('fill', d => {
             if (d.properties.value) {
               //console.log(d.properties.export_value);
@@ -127,9 +130,34 @@ class ChoroplethMap {
             }
           });
 
+          // Add overlay points starter
+      // d3.select(svgRef.current).selectAll('.parks')
+      //     .data(parks, (d) => d.name)
+      //     .join(
+      //       enter => (
+      //           enter.append('circle')
+      //           .attr('transform',(d) => `translate(${projRef.current([+d.lon, +d.lat])})`)
+      //           .attr('r', 4)
+      //           .attr('class', (d, i) => `parks park-${d.code}`)
+      //           .style('fill', (d) => d.color)
+      //           .style('opacity', 0)
+      //             .call(enter => (enter.transition().duration(1000).style('opacity', 1)))
+      //             ),
+      //       update => ( 
+      //         update.style('opacity', 1)),
+      //       exit => (
+      //         exit.call(exit => (
+      //             exit.transition().duration(1000).style('opacity', 0).remove()
+      //           ))
+      //         ),
+      //     )
+
+          
+
       countryPath
           .on('mousemove', (event,d) => {
-            console.log(vis.export_import);
+            //console.log(vis.export_import);
+            //console.log(d);
             const value = d.properties.value ? `${vis.export_import} value: <strong>$${Math.round(d.properties.value/(10**9))}</strong> billion` : 'No data available'; 
             d3.select('#tooltip')
               .style('display', 'block')
@@ -142,6 +170,21 @@ class ChoroplethMap {
           })
           .on('mouseleave', () => {
             d3.select('#tooltip').style('display', 'none');
+          });
+
+      // Bidirectional linked global country filters
+      countryPath
+          .on('click', (event, d) => {
+            if(vis.selected_country_name.includes(d.properties.name)){
+              vis.selected_country_name = vis.selected_country_name.filter(item => item!= d.properties.name);
+            } else {
+              vis.selected_country_name.push(d.properties.name);
+            }
+            vis.chart.selectAll('.country')
+                .data(countries.features)
+              .join('path')
+                .attr('stroke', d => vis.selected_country_name.includes(d.properties.name) ? "#333": "none")
+            vis.dispatcher.call('updateCountry', event, vis.selected_country_name);
           });
 
       // Add legend labels

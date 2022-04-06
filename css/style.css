@@ -101,7 +101,11 @@ h1 {
     stroke-width: 4;
 }
 
-
+/* TODO: Might need to change later */
+.country:hover {
+    opacity: 0.8;
+  }
+  
 
 /* Tooltip */
 .tooltip-cus {
