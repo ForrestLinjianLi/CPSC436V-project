@@ -13,8 +13,6 @@ class TreeMap {
             tooltipPadding: _config.tooltipPadding || 15
         }
         this.fullData = _data;
-        console.log(this.fullData)
-
         this.data = this.fullData.filter(d => countriesSelected.includes(d.location_code));
         this.data = this.data.filter(d => d.year >= selectedTime && d.year <= selectedTime);
         console.log(this.data);
@@ -85,13 +83,11 @@ class TreeMap {
         // stratify the data: reformatting for d3.js
 
         let data = vis.data;
-        console.log(data)
         let year, country;
         if(data[0] != null){
             year = data[0].year;
             country = data[0].country;
         }
-        console.log(year, country)
         // modify data to treemap structure
         if(data.length > 0){
             for(let i = 0; i < data.length; i++){
@@ -99,10 +95,8 @@ class TreeMap {
             }
             data.push({ product: "root", parent: "", export_value: 0, import_value: 0, year: year, country: country});
         }
-        console.log(data)
         var root = d3.stratify()
             .id(function(d) {
-                console.log(d.product)
                 return d.product; })   // Name of the entity (column name is name in csv)
             .parentId(function(d) {
                 return d.parent; })   // Name of the parent (column name is parent in csv)
@@ -117,8 +111,6 @@ class TreeMap {
             .size([vis.width, vis.height])
             .padding(4)
             (root)
-
-        console.log(root.leaves())
 
         vis.chartArea
             .selectAll("rect")

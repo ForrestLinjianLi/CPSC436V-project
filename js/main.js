@@ -1,7 +1,7 @@
 // Filters
 let countries = new Set();
 let countriesSelected = ['CAN'];
-let countriesSelectedName = ['Canada'];
+let countriesSelectedName = ['Japan', 'China', 'Italy'];
 let export_import = 'export';
 let selectedTime = 1995; 
 let mode = 'overview'; // overview/ exploration;
@@ -12,7 +12,7 @@ let name2id = {};
 // countriesSelected.map(d => id2name[d]);
 
 // Figures
-let overview, treemap, geomap, scatterplot, barChart;
+let overview, treemap, geomap, scatterplot, barChart, treeMapBarchat;
 //Data
 let data, timeFilteredData;
 
@@ -82,6 +82,12 @@ function initViews() {
     // treeMap
     treemap = new TreeMap({
         parentElement: '#scatter',
+        containerWidth: 600
+    }, data["mergedRawData"]);
+
+    // treeMap Barchart
+    treeMapBarchat = new TreeMapBarChart({
+        parentElement: '#treeMap-barchart',
         containerWidth: 600
     }, data["mergedRawData"]);
 
@@ -223,6 +229,7 @@ function uncheckAll() {
 
 function determineMode(){
     console.log("determine mode...")
+    console.log(countriesSelected)
     if(countriesSelected.length == 1) {
         // exploration mode
         d3.select("#out").attr("background", "#a7ebbb"); // TODO: Do something to change background color and mode color
