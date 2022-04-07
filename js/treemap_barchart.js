@@ -112,7 +112,13 @@ class TreeMapBarChart {
         // let data = []
         let count = 0
         vis.roots = []
-        vis.groupData.forEach((value, key)=>{
+        console.log(vis.groupData);
+        //console.log(vis.groupData.get(countriesSelectedName[0]));
+        countriesSelectedName.forEach((v, k) => {
+        // vis.groupData.forEach((value, key)=>{
+            const value = vis.groupData.get(countriesSelectedName[k]);
+            const key = v;
+            console.log(value, key);
             if(value.length > 0){
                 let year = value[0].year;
                 let country = value[0].country;
@@ -149,8 +155,13 @@ class TreeMapBarChart {
      */
     renderVis() {
         let vis = this;
+        console.log(vis.roots);
+        // Repeat the first item in roots to serve as a dummy
+        // vis.roots.splice(0, 0, vis.roots[0]);
+        // console.log(vis.roots);
         // Update the axes
         for (let i = 0; i < vis.roots.length; i++){
+            console.log(vis.roots[i]);
             d3.treemap()
                 .size([vis.xScale.bandwidth(), vis.yScale(vis.roots[i].value)])
                 .padding(4)
@@ -160,7 +171,7 @@ class TreeMapBarChart {
                 .data(vis.roots[i].leaves())
                 .enter()
                 .append("rect")
-                .attr("class", "treeBlock" + i)
+                .attr("class", "rect")
                 // TODO: Not idea how to translate position to right
                 // TODO: always miss first treeMap
                 .attr('transform', `translate(${i*vis.xScale.bandwidth() + 50}, ${vis.height - vis.yScale(vis.roots[i].value)})`)
@@ -169,7 +180,7 @@ class TreeMapBarChart {
                     return d.x0;})
                 .attr('y', function (d) {return d.y0;})
                 .attr('width', function (d) {return d.x1 - d.x0;})
-                .attr('height', function (d) {return d.y1 - d.y0;})
+                .attr('height', function (d) {return 100;})
                 .attr('fill', d => vis.productColorScale(d.data.product))
                 .on("mouseover", (event, d) => {
                     // tooltip
