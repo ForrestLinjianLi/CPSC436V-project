@@ -136,13 +136,13 @@ class TreeMap {
                     <div class="tooltip-title">${country}</div>
                     <ul>
                       <li>Year: ${year}</li>
-                      <li>${d.data.product} ${export_import} value: ${(d.data.export_value/1000000000).toFixed(4)} Billion USD</li>
+                      <li>${d.data.product} ${export_import} value: ${(d.data.export_value/1000000000).toFixed(2)} Billion USD</li>
                     <ul> 
                     `: `
                     <div class="tooltip-title">${country}</div>
                     <ul>
                       <li>Year: ${year}</li>
-                      <li>${d.data.product} ${export_import} value: ${(d.data.import_value/1000000000).toFixed(4)} Billion USD</li>
+                      <li>${d.data.product} ${export_import} value: ${(d.data.import_value/1000000000).toFixed(2)} Billion USD</li>
                     <ul> 
                     `);
             })

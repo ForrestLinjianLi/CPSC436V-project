@@ -52,8 +52,8 @@ class TreeMapBarChart {
 
         // initialize axes
         vis.xAxis = d3.axisBottom(vis.xScale)
-            .tickSize(0);
-
+            .tickSize(-vis.height)
+            .tickSizeOuter(0)
 
         vis.yAxis = d3.axisLeft(vis.yScale)
             .tickSize(-vis.width - 10)
@@ -145,7 +145,9 @@ class TreeMapBarChart {
         // Specificy domains for each scale
         vis.xScale.domain(countriesSelectedName)
         // vis.x1Scale.rangeRound([0, vis.x0Scale.bandwidth()])
-        vis.yScale.domain([d3.max(vis.roots, d => d.value), 0])
+        vis.yMax = d3.max(vis.roots, d => d.value) + 10000000000;
+        console.log("max val: "+vis.yMax)
+        vis.yScale.domain([vis.yMax, 0])
         vis.productColorScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics"]);
         vis.renderVis();
     }
@@ -162,8 +164,12 @@ class TreeMapBarChart {
         // Update the axes
         for (let i = 0; i < vis.roots.length; i++){
             console.log(vis.roots[i]);
+            console.log("root val: "+vis.roots[i].value)
+            console.log("yScale root val: "+vis.yScale(vis.roots[i].value))
+            let height = (vis.roots[i].value)/vis.yMax * vis.height
+            console.log("height: " + height)
             d3.treemap()
-                .size([vis.xScale.bandwidth(), vis.yScale(vis.roots[i].value)])
+                .size([vis.xScale.bandwidth(), height])
                 .padding(4)
                 (vis.roots[i])
             vis.chart
@@ -172,15 +178,14 @@ class TreeMapBarChart {
                 .enter()
                 .append("rect")
                 .attr("class", "rect")
-                // TODO: Not idea how to translate position to right
-                // TODO: always miss first treeMap
-                .attr('transform', `translate(${i*vis.xScale.bandwidth() + 50}, ${vis.height - vis.yScale(vis.roots[i].value)})`)
+                // TODO: change the x-axis position for each bar
+                .attr('transform', `translate(${10+i*vis.xScale.bandwidth() + i * vis.width/(4*vis.roots.length)}, ${vis.height+4-height})`)
                 .attr('x', function (d) {
                     console.log(d);
                     return d.x0;})
                 .attr('y', function (d) {return d.y0;})
                 .attr('width', function (d) {return d.x1 - d.x0;})
-                .attr('height', function (d) {return 100;})
+                .attr('height', function (d) {return d.y1 - d.y0;})
                 .attr('fill', d => vis.productColorScale(d.data.product))
                 .on("mouseover", (event, d) => {
                     // tooltip
@@ -195,13 +200,15 @@ class TreeMapBarChart {
                     <div class="tooltip-title">${d.data.country}</div>
                     <ul>
                       <li>Year: ${d.data.year}</li>
-                      <li>${d.data.product} ${export_import} value: ${(d.data.export_value/1000000000).toFixed(4)} Billion USD</li>
+                      <li>${d.data.product} ${export_import} value: ${(d.data.export_value/1000000000).toFixed(2)} Billion USD</li>
+                      <li>Total ${export_import} value: ${(vis.roots[i].value/1000000000).toFixed(2)} Billion USD</li>
                     <ul> 
                     `: `
                     <div class="tooltip-title">${d.data.country}</div>
                     <ul>
                       <li>Year: ${d.data.year}</li>
-                      <li>${d.data.product} ${export_import} value: ${(d.data.import_value/1000000000).toFixed(4)} Billion USD</li>
+                      <li>${d.data.product} ${export_import} value: ${(d.data.import_value/1000000000).toFixed(2)} Billion USD</li>
+                      <li>Total ${export_import} value: ${(vis.roots[i].value/1000000000).toFixed(2)} Billion USD</li>
                     <ul> 
                     `);
                 })
