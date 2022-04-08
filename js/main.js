@@ -78,14 +78,8 @@ function initViews() {
     determineMode();
 
     // add button listeners
-    document.getElementById("btnradio1").addEventListener('click', () => {
-        export_import = 'export';
-        console.log(this);
-        updateGeomap();
-        determineMode();
-    });
-    document.getElementById("btnradio2").addEventListener('click', () => {
-        export_import = 'import';
+    document.getElementsByClassName("btn-group ")[0].addEventListener('click', (e) => {
+        export_import = e.target.innerText.toLowerCase();
         updateGeomap();
         determineMode();
     });
@@ -182,6 +176,10 @@ async function updateCountryCheckbox() {
     myPromise.then(v => {
         document.getElementById("country-filter").innerHTML = v;
     })
+}
+
+function aaa(){
+    console.log('eeeeee');
 }
 
 // Check 5 countries
