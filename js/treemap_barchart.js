@@ -8,8 +8,8 @@ class TreeMapBarChart {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 800,
-            containerHeight: 450,
+            containerWidth:  _config.containerWidth || 1000,
+            containerHeight: _config.containerHeight || 500,
             margin: {top: 60, right: 150, bottom: 20, left: 30},
             tooltipPadding: _config.tooltipPadding || 15
         }
@@ -53,7 +53,6 @@ class TreeMapBarChart {
         // initialize axes
         vis.xAxis = d3.axisBottom(vis.xScale)
             .tickSize(-vis.height)
-            .tickSizeOuter(0)
             .ticks(countriesSelectedName.length)
 
         vis.yAxis = d3.axisLeft(vis.yScale)
@@ -69,7 +68,7 @@ class TreeMapBarChart {
         vis.xAxisG = vis.chart.append('g')
             .attr('class', 'axis x-axis')
             .attr("id", "x-axis")
-            .attr('transform', `translate(0,${vis.height+10})`)
+            .attr('transform', `translate(0,${vis.height+5})`)
             .attr("stroke-opacity", 0.2);
 
 
@@ -113,23 +112,14 @@ class TreeMapBarChart {
     updateVis() {
         let vis = this;
         countriesSelectedName = countriesSelected.map(d => id2name[d]);
-        console.log("All");
-        vis.svg.selectAll(".tick").each(function(data) {
-            var tick = d3.select(this);
-            var transform = d3.transform(tick.attr("transform")).translate;
-            // passed in "data" is the value of the tick, transform[0] holds the X value
-            console.log("each tick", data, transform);
-        });
         d3.select("#valueText").text((export_import == "export") ? "Export in Billion USD":"Import in Billion USD");
         d3.select("#scatterTitle").text((export_import == "export") ?
             "Countries Export Value Comparison by Product in " + selectedTime
             :"Countries Import Value Comparison by Product in " + selectedTime)
 
         vis.groupData = d3.group(vis.data, d=>d.country)
-        // let data = []
         let count = 0
         vis.roots = []
-        console.log(vis.groupData);
         countriesSelectedName.forEach((v, k) => {
             const value = vis.groupData.get(countriesSelectedName[k]);
             const key = v;
@@ -158,8 +148,7 @@ class TreeMapBarChart {
 
         // Specificy domains for each scale
         vis.xScale.domain(countriesSelectedName)
-        vis.yMax = d3.max(vis.roots, d => d.value) + 10000000000;
-        console.log("max val: "+vis.yMax)
+        vis.yMax = d3.max(vis.roots, d => d.value) + 20000000000;
         vis.yScale.domain([vis.yMax, 0])
         vis.productColorScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other"]);
         vis.colorLegend = d3.legendColor()
@@ -189,15 +178,14 @@ class TreeMapBarChart {
         console.log(vis.roots);
         // Update the axes
         for (let i = 0; i < vis.roots.length; i++){
-            console.log(vis.roots[i]);
-            console.log("root val: "+vis.roots[i].value)
-            console.log("yScale root val: "+vis.yScale(vis.roots[i].value))
             let height = (vis.roots[i].value)/vis.yMax * vis.height
             console.log("height: " + height)
+            console.log("yScale(country): " + vis.yScale(vis.roots[i].value))
             d3.treemap()
-                .size([vis.xScale.bandwidth(), height])
-                .padding(4)
+                .size([vis.xScale.bandwidth(), height+6])
+                .padding(2)
                 (vis.roots[i])
+            console.log(vis.xScale(vis.roots[i].data.country))
             vis.chart
                 .selectAll("rect"+i)
                 .data(vis.roots[i].leaves())
@@ -205,13 +193,12 @@ class TreeMapBarChart {
                 .append("rect")
                 .attr("class", "rect")
                 // TODO: change the x-axis position for each bar
-                .attr('transform', `translate(${10+i*vis.xScale.bandwidth() + i * vis.width/(4*vis.roots.length)}, ${vis.height+4-height})`)
+                .attr('transform', `translate(${vis.xScale(vis.roots[i].data.country)}, ${vis.yScale(vis.roots[i].value)-4})`)
                 .attr('x', function (d) {return d.x0;})
                 .attr('y', function (d) {return d.y0;})
-                .attr('width', function (d) {return Math.max(0, d.x1 - d.x0 + 1.5) ;})
-                .attr('height', function (d) {return Math.max(0, d.y1 - d.y0 + 1.5) ;})
+                .attr('width', function (d) {return Math.max(0, d.x1 - d.x0) ;})
+                .attr('height', function (d) {return Math.max(0, d.y1 - d.y0) ;})
                 .attr('fill', d => vis.productColorScale(d.data.product))
-                .style("stroke", "black")
                 .on("mouseover", (event, d) => {
                     // tooltip
                     d3.select("#tooltip")

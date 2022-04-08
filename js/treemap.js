@@ -7,8 +7,8 @@ class TreeMap {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 700,
-            containerHeight: 450,
+            containerWidth:  _config.containerWidth || 1000,
+            containerHeight: _config.containerHeight || 500,
             margin: {top: 40, right: 20, bottom: 20, left: 20},
             tooltipPadding: _config.tooltipPadding || 15
         }

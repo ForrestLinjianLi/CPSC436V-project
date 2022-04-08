@@ -226,7 +226,7 @@ function determineMode(){
         document.getElementById('modeTitle').innerHTML = "Exploration Mode";
         treemap = new TreeMap({
             parentElement: '#scatter',
-            containerWidth: 1000
+            containerWidth: 800
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
@@ -235,7 +235,7 @@ function determineMode(){
         document.getElementById('modeTitle').innerHTML = "Overview Mode";
         scatterplot = new TreeMapBarChart({
             parentElement: '#scatter',
-            containerWidth: 1000
+            containerWidth: 800
         }, data["mergedRawData"]);
     }
 }

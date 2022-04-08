@@ -8,7 +8,7 @@ class Scatterplot {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 700,
+            containerWidth: _config.containerWidth || 700,
             containerHeight: 450,
             margin: {top: 60, right: 90, bottom: 20, left: 55},
             tooltipPadding: _config.tooltipPadding || 15
