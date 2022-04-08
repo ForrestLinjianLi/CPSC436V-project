@@ -24,7 +24,10 @@
 
 .row {
     padding: 10px;
+    display: grid;
+    grid-template-columns: auto auto;
 }
+
 
 #filter-container {
     width: 100%;
@@ -43,7 +46,7 @@
 
 #country-filter {
     width: 100%;
-    height: 700px;
+    height: 300px;
     overflow: scroll;
 }
 

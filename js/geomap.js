@@ -8,7 +8,7 @@ class ChoroplethMap {
     constructor(_config, _world_data, _value_data, _export_import, _selected_country_id, _dispatcher) {
       this.config = {
         parentElement: _config.parentElement,
-        containerWidth: _config.containerWidth || 1000,
+        containerWidth: _config.containerWidth || 800,
         containerHeight: _config.containerHeight || 500,
         margin: _config.margin || {top: 0, right: 20, bottom: 0, left: 0},
         tooltipPadding: 10,
@@ -39,7 +39,7 @@ class ChoroplethMap {
       vis.svg = d3.select(vis.config.parentElement).append('svg')
           .attr('width', vis.config.containerWidth)
           .attr('height', vis.config.containerHeight);
-  
+
       // Append group element that will contain our actual chart 
       // and position it according to the given margin config
       vis.chart = vis.svg.append('g')
@@ -63,7 +63,9 @@ class ChoroplethMap {
       vis.legendRect = vis.legend.append('rect')
           .attr('width', vis.config.legendRectWidth)
           .attr('height', vis.config.legendRectHeight);
-  
+
+      vis.strokeWidth = 1.7;
+
       vis.updateVis();
     }
   
@@ -72,7 +74,7 @@ class ChoroplethMap {
         let indexs = vis.value_data['node'].map(d => d.id);
         if (vis.export_import == 'export') {
             vis.c1 = '#cfe2f2';
-            vis.c2 = '#0d306b';
+            vis.c2 = '#2e73ad';
             vis.data.features.forEach(d => {
                 d.properties.value = indexs.includes(d.id)? d3.sum(Object.entries(vis.value_data['node'][indexs.indexOf(d.id)]['export']), j => j[1]):0});
         } else {
@@ -120,6 +122,7 @@ class ChoroplethMap {
           .attr('class', 'country')
           .attr('d', vis.geoPath)
           .attr('stroke', d => vis.selected_country_id.includes(d.id) ? "#333": "none")
+          .attr('stroke-width', `${vis.strokeWidth}px`)
           .attr('fill', d => {
             if (d.properties.value) {
               //console.log(d.properties.export_value);
@@ -130,29 +133,6 @@ class ChoroplethMap {
             }
           });
 
-          // Add overlay points starter
-      // d3.select(svgRef.current).selectAll('.parks')
-      //     .data(parks, (d) => d.name)
-      //     .join(
-      //       enter => (
-      //           enter.append('circle')
-      //           .attr('transform',(d) => `translate(${projRef.current([+d.lon, +d.lat])})`)
-      //           .attr('r', 4)
-      //           .attr('class', (d, i) => `parks park-${d.code}`)
-      //           .style('fill', (d) => d.color)
-      //           .style('opacity', 0)
-      //             .call(enter => (enter.transition().duration(1000).style('opacity', 1)))
-      //             ),
-      //       update => ( 
-      //         update.style('opacity', 1)),
-      //       exit => (
-      //         exit.call(exit => (
-      //             exit.transition().duration(1000).style('opacity', 0).remove()
-      //           ))
-      //         ),
-      //     )
-
-          
 
       countryPath
           .on('mousemove', (event,d) => {
@@ -186,6 +166,7 @@ class ChoroplethMap {
                 .data(countries.features)
               .join('path')
                 .attr('stroke', d => vis.selected_country_id.includes(d.id) ? "#333": "none")
+                .attr('stroke-width', `${vis.strokeWidth}px`);
             vis.dispatcher.call('updateCountry', event, vis.selected_country_id);
           });
 
@@ -218,5 +199,17 @@ class ChoroplethMap {
           .attr('stop-color', d => d.color);
 
       vis.legendRect.attr('fill', 'url(#legend-gradient)');
+
+      var zoom = d3.zoom()
+          .scaleExtent([0.7, 6])
+          .on('zoom', e => {
+            //console.log(e);
+            vis.strokeWidth = 1.7/e.transform.k;
+            vis.chart.selectAll('.country')
+              .attr('transform', e.transform)
+              .attr('stroke-width', `${vis.strokeWidth}px`);
+          });
+
+      vis.svg.call(zoom);
     }
 }

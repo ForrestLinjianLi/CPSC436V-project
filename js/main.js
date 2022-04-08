@@ -1,15 +1,11 @@
 // Filters
 let countries = new Set();
 let countriesSelected = ['CAN'];
-// let countriesSelectedName = ['Japan', 'China', 'Italy'];
 let export_import = 'export';
 let selectedTime = 1995; 
 let mode = 'overview'; // overview/ exploration;
 let id2name = {};
 let name2id = {};
-
-// Remark: If you want to use country name instead of id, use the following function:
-// countriesSelected.map(d => id2name[d]);
 
 // Figures
 let overview, treemap, geomap, scatterplot, barChart, treeMapBarchat;
@@ -75,12 +71,11 @@ function initViews() {
 
     // Geomap
     geomap = new ChoroplethMap({
-        parentElement: '#geomap',
-        containerWidth: 600
+        parentElement: '#geomap'
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
     // init scatterplot/tree map based on mode
-    determineMode()
+    determineMode();
 
     // add button listeners
     document.getElementById("btnradio1").addEventListener('click', () => {
@@ -99,18 +94,18 @@ function initViews() {
 
 function initDispatchers() {
     dispatcher.on('updateCountry', countries_id => {
-        console.log(countries_id);
+        //console.log(countries_id);
         countriesSelected = countries_id;
-        // TODO: change in treeMap barchart
-        // countriesSelectedName = countriesSelected.map(d => id2name[d]);
         updateDisplayedCountries();
+        determineMode();
     });
 
     dispatcher.on('updateTime', s => {
-        updateDisplayedCountries();
         selectedTime = s;
         timeFilteredData = data["rollupForceData"][selectedTime];
         console.log(timeFilteredData);
+
+        updateDisplayedCountries();
 
         overview.data = timeFilteredData;
         overview.updateVis();
@@ -136,14 +131,11 @@ function updateDisplayedCountries() {
                     const elem = event.currentTarget;
                     const label = elem.parentNode.outerText;
                     if (elem.checked) {
-                        // countriesSelectedName.push(label);
                         countriesSelected.push(name2id[label]);
                     } else {
-                        // countriesSelectedName = countriesSelectedName.filter(d => d != label);
                         countriesSelected = countriesSelected.filter(d => d != name2id[label]);
                     }
                     //console.log(label);
-                    //console.log(countriesSelectedName);
                     // console.log(elem.parentNode);
                     updateGeomap();
                     determineMode();
@@ -157,31 +149,34 @@ function updateDisplayedCountries() {
 
 function updateGeomap() {
     geomap.export_import = export_import;
-    // geomap.selected_country_name = countriesSelectedName;
+    geomap.selected_country_id = countriesSelected;
     geomap.value_data = timeFilteredData;
     geomap.updateVis();
 }
 
 async function updateCountryCheckbox() {
     countries.clear();
-    console.log(timeFilteredData["node"]);
+    //console.log(timeFilteredData["node"]);
     timeFilteredData["node"].forEach(item => countries.add(item.id));
+    countriesSelected = countriesSelected.filter(d => Array.from(countries).includes(d));
 
-    console.log(countries);
+    //console.log(countries);
     const myPromise = new Promise((resolve, reject) => {
         var countryHTML = "";
-        let checked = "";
-        let stillChecked = 0;
+        var checked = "";
+        //let stillChecked = 0; // probably dont need to consider for the edge case here 
         Array.from(countries).sort().forEach(val => {
-            if(countriesSelected.includes(val)) {checked = "checked"; stillChecked += 1;} else {checked = "";};
+            if(countriesSelected.includes(val)) {checked = "checked"; 
+                // stillChecked += 1;
+            } else {checked = "";};
             countryHTML += `
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`>
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`> 
             <label class="form-check-label" for="flexCheckDefault">` + id2name[val] + ` </label>
         </div>
     `
         });
-        if (stillChecked == 0) uncheckAll();
+        //if (stillChecked == 0) uncheckAll(); // probably dont need to consider for the edge case here 
         resolve(countryHTML);
     })
     myPromise.then(v => {
@@ -192,26 +187,29 @@ async function updateCountryCheckbox() {
 // Check 5 countries
 function checkAll() {
     const sel = d3.selectAll('.form-check-input');
-    // countriesSelectedName = [];
-    for (let i = 0; i < 5; i++) {
-        sel._groups[0][i].checked = true;
-        // countriesSelectedName.push(sel._groups[0][i].parentElement.outerText);
-        countriesSelected = countriesSelectedName.map(d => name2id[d]);
+    sel.property('checked', false);
+    console.log(sel);
+    countriesSelected = [];
+    var randomIndexes = [];
+    while(randomIndexes.length < 5 || randomIndexes.length == sel._groups[0].length){
+        const randomIndex = Math.floor(Math.random() * sel._groups[0].length);
+        if (!randomIndexes.includes(randomIndex)) randomIndexes.push(randomIndex);
     }
+    randomIndexes.map(d => {
+        sel._groups[0][d].checked = true;
+        countriesSelected.push(name2id[sel._groups[0][d].parentElement.outerText]);
+    });
     updateGeomap();
     determineMode();
-
-
 }
 
 // uncheck to 1 country
 function uncheckAll() {
     const sel = d3.selectAll('.form-check-input');
+    const randomIndex = Math.floor(Math.random() * sel._groups[0].length);
     sel.property('checked', false);
-    sel._groups[0][0].checked = true;
-    // countriesSelectedName = [];
-    // countriesSelectedName.push(sel._groups[0][0].parentElement.outerText);
-    // countriesSelected = countriesSelectedName.map(d => name2id[d]);
+    sel._groups[0][randomIndex].checked = true;
+    countriesSelected = [name2id[sel._groups[0][randomIndex].parentElement.outerText]];
     updateGeomap();
     determineMode();
 }
