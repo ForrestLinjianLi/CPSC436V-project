@@ -8,7 +8,7 @@ class TreeMapBarChart {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 800,
+            containerWidth: 1000,
             containerHeight: 450,
             margin: {top: 60, right: 150, bottom: 20, left: 30},
             tooltipPadding: _config.tooltipPadding || 15
