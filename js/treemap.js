@@ -15,7 +15,6 @@ class TreeMap {
         this.fullData = _data;
         this.data = this.fullData.filter(d => countriesSelected.includes(d.location_code));
         this.data = this.data.filter(d => d.year >= selectedTime && d.year <= selectedTime);
-        console.log(this.data);
         this.initVis();
     }
 
@@ -123,6 +122,7 @@ class TreeMap {
             .attr('width', function (d) {return d.x1 - d.x0;})
             .attr('height', function (d) {return d.y1 - d.y0;})
             .attr('fill', d => vis.productColorScale(d.data.product))
+            .style("stroke", "black")
             .on("mouseover", (event, d) => {
                 // tooltip
                 d3.select("#tooltip")

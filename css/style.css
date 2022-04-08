@@ -131,41 +131,41 @@ h1 {
 }
 
 .Textiles {
-    fill: beige;
+    fill: #1f77b4;
 }
 
 .Agriculture {
-    fill:green;
+    fill:#ff7f0e;
 }
 
 .Stone {
-    fill: grey;
+    fill: #2ca02c;
 }
 
 .Minerals {
-    fill: saddlebrown;
+    fill: #d62728;
 }
 
 .Metals {
-    fill: gold;
+    fill: #9467bd;
 }
 
 .Chemicals {
-    fill: cornflowerblue;
+    fill: #8c564b;
 }
 
 .Vehicles {
-    fill: black;
+    fill: #e377c2;
 }
 
 .Machinery {
-    fill: #842029;
+    fill: #7f7f7f;
 }
 
 .Electronics {
-    fill: red;
+    fill: #bcbd22;
 }
 
 .Other {
-    fill:pink;
+    fill:#17becf;
 }

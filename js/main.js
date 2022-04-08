@@ -1,7 +1,7 @@
 // Filters
 let countries = new Set();
 let countriesSelected = ['CAN'];
-let countriesSelectedName = ['Japan', 'China', 'Italy'];
+// let countriesSelectedName = ['Japan', 'China', 'Italy'];
 let export_import = 'export';
 let selectedTime = 1995; 
 let mode = 'overview'; // overview/ exploration;
@@ -79,18 +79,6 @@ function initViews() {
         containerWidth: 600
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
-    // treeMap
-    treemap = new TreeMap({
-        parentElement: '#scatter',
-        containerWidth: 600
-    }, data["mergedRawData"]);
-
-    // treeMap Barchart
-    treeMapBarchat = new TreeMapBarChart({
-        parentElement: '#treeMap-barchart',
-        containerWidth: 600
-    }, data["mergedRawData"]);
-
     // init scatterplot/tree map based on mode
     determineMode()
 
@@ -113,7 +101,8 @@ function initDispatchers() {
     dispatcher.on('updateCountry', countries_id => {
         console.log(countries_id);
         countriesSelected = countries_id;
-        countriesSelectedName = countriesSelected.map(d => id2name[d]);
+        // TODO: change in treeMap barchart
+        // countriesSelectedName = countriesSelected.map(d => id2name[d]);
         updateDisplayedCountries();
     });
 
@@ -147,10 +136,10 @@ function updateDisplayedCountries() {
                     const elem = event.currentTarget;
                     const label = elem.parentNode.outerText;
                     if (elem.checked) {
-                        countriesSelectedName.push(label);
+                        // countriesSelectedName.push(label);
                         countriesSelected.push(name2id[label]);
                     } else {
-                        countriesSelectedName = countriesSelectedName.filter(d => d != label);
+                        // countriesSelectedName = countriesSelectedName.filter(d => d != label);
                         countriesSelected = countriesSelected.filter(d => d != name2id[label]);
                     }
                     //console.log(label);
@@ -168,7 +157,7 @@ function updateDisplayedCountries() {
 
 function updateGeomap() {
     geomap.export_import = export_import;
-    geomap.selected_country_name = countriesSelectedName;
+    // geomap.selected_country_name = countriesSelectedName;
     geomap.value_data = timeFilteredData;
     geomap.updateVis();
 }
@@ -203,10 +192,10 @@ async function updateCountryCheckbox() {
 // Check 5 countries
 function checkAll() {
     const sel = d3.selectAll('.form-check-input');
-    countriesSelectedName = [];
+    // countriesSelectedName = [];
     for (let i = 0; i < 5; i++) {
         sel._groups[0][i].checked = true;
-        countriesSelectedName.push(sel._groups[0][i].parentElement.outerText);
+        // countriesSelectedName.push(sel._groups[0][i].parentElement.outerText);
         countriesSelected = countriesSelectedName.map(d => name2id[d]);
     }
     updateGeomap();
@@ -220,9 +209,9 @@ function uncheckAll() {
     const sel = d3.selectAll('.form-check-input');
     sel.property('checked', false);
     sel._groups[0][0].checked = true;
-    countriesSelectedName = [];
-    countriesSelectedName.push(sel._groups[0][0].parentElement.outerText);
-    countriesSelected = countriesSelectedName.map(d => name2id[d]);
+    // countriesSelectedName = [];
+    // countriesSelectedName.push(sel._groups[0][0].parentElement.outerText);
+    // countriesSelected = countriesSelectedName.map(d => name2id[d]);
     updateGeomap();
     determineMode();
 }
@@ -237,16 +226,16 @@ function determineMode(){
         document.getElementById('modeTitle').innerHTML = "Exploration Mode";
         treemap = new TreeMap({
             parentElement: '#scatter',
-            containerWidth: 600
+            containerWidth: 1000
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
         d3.select("#out").attr("background", "#f0f3f5"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");
         document.getElementById('modeTitle').innerHTML = "Overview Mode";
-        scatterplot = new Scatterplot({
+        scatterplot = new TreeMapBarChart({
             parentElement: '#scatter',
-            containerWidth: 600
+            containerWidth: 1000
         }, data["mergedRawData"]);
     }
 }

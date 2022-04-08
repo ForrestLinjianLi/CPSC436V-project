@@ -1,3 +1,4 @@
+let countriesSelectedName;
 class TreeMapBarChart {
     /**
      * Class constructor with basic chart configuration
@@ -7,14 +8,13 @@ class TreeMapBarChart {
     constructor(_config, _data) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 700,
+            containerWidth: 800,
             containerHeight: 450,
-            margin: {top: 40, right: 20, bottom: 20, left: 20},
+            margin: {top: 60, right: 150, bottom: 20, left: 30},
             tooltipPadding: _config.tooltipPadding || 15
         }
         this.fullData = _data;
-        console.log(this.fullData)
-
+        countriesSelectedName = countriesSelected.map(d => id2name[d]);
         this.data = this.fullData.filter(d => countriesSelectedName.includes(d.country));
         this.data = this.data.filter(d => d.year >= selectedTime && d.year <= selectedTime);
         console.log(this.data);
@@ -54,6 +54,7 @@ class TreeMapBarChart {
         vis.xAxis = d3.axisBottom(vis.xScale)
             .tickSize(-vis.height)
             .tickSizeOuter(0)
+            .ticks(countriesSelectedName.length)
 
         vis.yAxis = d3.axisLeft(vis.yScale)
             .tickSize(-vis.width - 10)
@@ -67,6 +68,7 @@ class TreeMapBarChart {
         // Append empty x-axis group and move it to the bottom of the chart
         vis.xAxisG = vis.chart.append('g')
             .attr('class', 'axis x-axis')
+            .attr("id", "x-axis")
             .attr('transform', `translate(0,${vis.height+10})`)
             .attr("stroke-opacity", 0.2);
 
@@ -76,11 +78,20 @@ class TreeMapBarChart {
             .attr('class', 'axis y-axis')
             .attr("stroke-opacity", 0.2);
 
+        vis.colorLegendG = vis.chart.append('g')
+            .attr('transform', `translate(${vis.width + 37}, 20)`)
+            .style("font-size", '0.5rem');
+
+        vis.colorLegendG.append('text')
+            .attr('class', 'legend-label')
+            .attr('x', -30)
+            .attr('y', -40);
+
         //append title
         vis.svg.append('text')
             .attr('id', 'treeMapBarChartTitle')
-            .attr("x", 350)
-            .attr("y", 10)
+            .attr("x", 330)
+            .attr("y", 20)
             .attr("text-anchor", "middle")
             .attr('font-size', '21px')
             .attr('font-weight', 'bold')
@@ -91,9 +102,9 @@ class TreeMapBarChart {
         vis.svg.append("text")
             .attr("class", "text-label")
             .attr("id", "valueText")
-            .attr('y', 25)
+            .attr('y', 44)
             .attr('x', 0)
-            .text("Export Value in Billion");
+            .text("Export in Billion $USD");
 
         vis.updateVis();
     }
@@ -101,54 +112,59 @@ class TreeMapBarChart {
 
     updateVis() {
         let vis = this;
-        d3.select("#valueText").text((export_import == "export") ? "Export Value in Billion":"Import Value in Billion");
+        countriesSelectedName = countriesSelected.map(d => id2name[d]);
+        console.log("All");
+        vis.svg.selectAll(".tick").each(function(data) {
+            var tick = d3.select(this);
+            var transform = d3.transform(tick.attr("transform")).translate;
+            // passed in "data" is the value of the tick, transform[0] holds the X value
+            console.log("each tick", data, transform);
+        });
+        d3.select("#valueText").text((export_import == "export") ? "Export in Billion USD":"Import in Billion USD");
         d3.select("#scatterTitle").text((export_import == "export") ?
             "Countries Export Value Comparison by Product in " + selectedTime
             :"Countries Import Value Comparison by Product in " + selectedTime)
 
-        // TODO: for now only set 5 country at max
-        // modify data to treemap barchart structure
         vis.groupData = d3.group(vis.data, d=>d.country)
         // let data = []
         let count = 0
         vis.roots = []
         console.log(vis.groupData);
-        //console.log(vis.groupData.get(countriesSelectedName[0]));
         countriesSelectedName.forEach((v, k) => {
-        // vis.groupData.forEach((value, key)=>{
             const value = vis.groupData.get(countriesSelectedName[k]);
             const key = v;
-            console.log(value, key);
-            if(value.length > 0){
-                let year = value[0].year;
-                let country = value[0].country;
-                count++;
-                for(let i = 0; i < value.length; i++){
-                    value[i]['parent'] = 'root' + key;
+            if (value != null){
+                if(value.length > 0){
+                    let year = value[0].year;
+                    let country = value[0].country;
+                    count++;
+                    for(let i = 0; i < value.length; i++){
+                        value[i]['parent'] = 'root' + key;
+                    }
+                    value.push({ product: 'root' + key, parent: "", export_value: 0, import_value: 0, year: year, country: country});
                 }
-                value.push({ product: 'root' + key, parent: "", export_value: 0, import_value: 0, year: year, country: country});
+                let root = d3.stratify()
+                    .id(function(d) {
+                        return d.product; })   // Name of the entity (column name is name in csv)
+                    .parentId(function(d) {
+                        return d.parent; })   // Name of the parent (column name is parent in csv)
+                    (value)
+                root.sum(function(d) {
+                    let ret = (export_import == "export")? d.export_value : d.import_value;
+                    return +ret})   // Compute the numeric value for each entity
+                vis.roots.push(root);
             }
-            let root = d3.stratify()
-                .id(function(d) {
-                    return d.product; })   // Name of the entity (column name is name in csv)
-                .parentId(function(d) {
-                    return d.parent; })   // Name of the parent (column name is parent in csv)
-                (value)
-            root.sum(function(d) {
-                let ret = (export_import == "export")? d.export_value : d.import_value;
-                return +ret})   // Compute the numeric value for each entity
-            vis.roots.push(root);
         })
-
-        console.log(vis.roots)
 
         // Specificy domains for each scale
         vis.xScale.domain(countriesSelectedName)
-        // vis.x1Scale.rangeRound([0, vis.x0Scale.bandwidth()])
         vis.yMax = d3.max(vis.roots, d => d.value) + 10000000000;
         console.log("max val: "+vis.yMax)
         vis.yScale.domain([vis.yMax, 0])
-        vis.productColorScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics"]);
+        vis.productColorScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other"]);
+        vis.colorLegend = d3.legendColor()
+            .scale(vis.productColorScale)
+            .shape('circle');
         vis.renderVis();
     }
 
@@ -157,10 +173,20 @@ class TreeMapBarChart {
      */
     renderVis() {
         let vis = this;
+        vis.xAxisG
+            .call(vis.xAxis)
+            .call(g => g.select('.domain').remove());
+
+        vis.yAxisG
+            .call(vis.yAxis)
+            .call(g => g.select('.domain').remove());
+
+        let legendg = vis.colorLegendG.call(vis.colorLegend);
+        legendg.selectAll('.cell text')
+            .attr('dy', '0.1em')
+            .attr("font-size", "12px");
+
         console.log(vis.roots);
-        // Repeat the first item in roots to serve as a dummy
-        // vis.roots.splice(0, 0, vis.roots[0]);
-        // console.log(vis.roots);
         // Update the axes
         for (let i = 0; i < vis.roots.length; i++){
             console.log(vis.roots[i]);
@@ -180,13 +206,12 @@ class TreeMapBarChart {
                 .attr("class", "rect")
                 // TODO: change the x-axis position for each bar
                 .attr('transform', `translate(${10+i*vis.xScale.bandwidth() + i * vis.width/(4*vis.roots.length)}, ${vis.height+4-height})`)
-                .attr('x', function (d) {
-                    console.log(d);
-                    return d.x0;})
+                .attr('x', function (d) {return d.x0;})
                 .attr('y', function (d) {return d.y0;})
-                .attr('width', function (d) {return d.x1 - d.x0;})
-                .attr('height', function (d) {return d.y1 - d.y0;})
+                .attr('width', function (d) {return Math.max(0, d.x1 - d.x0 + 1.5) ;})
+                .attr('height', function (d) {return Math.max(0, d.y1 - d.y0 + 1.5) ;})
                 .attr('fill', d => vis.productColorScale(d.data.product))
+                .style("stroke", "black")
                 .on("mouseover", (event, d) => {
                     // tooltip
                     d3.select("#tooltip")
@@ -197,17 +222,15 @@ class TreeMapBarChart {
                         .html(
                             (export_import == "export") ?
                                 `
-                    <div class="tooltip-title">${d.data.country}</div>
+                    <div class="tooltip-title">${d.data.product}</div>
                     <ul>
-                      <li>Year: ${d.data.year}</li>
-                      <li>${d.data.product} ${export_import} value: ${(d.data.export_value/1000000000).toFixed(2)} Billion USD</li>
+                      <li>${export_import} value: ${(d.data.export_value/1000000000).toFixed(2)} Billion USD</li>
                       <li>Total ${export_import} value: ${(vis.roots[i].value/1000000000).toFixed(2)} Billion USD</li>
                     <ul> 
                     `: `
-                    <div class="tooltip-title">${d.data.country}</div>
+                    <div class="tooltip-title">${d.data.product}</div>
                     <ul>
-                      <li>Year: ${d.data.year}</li>
-                      <li>${d.data.product} ${export_import} value: ${(d.data.import_value/1000000000).toFixed(2)} Billion USD</li>
+                      <li>${export_import} value: ${(d.data.import_value/1000000000).toFixed(2)} Billion USD</li>
                       <li>Total ${export_import} value: ${(vis.roots[i].value/1000000000).toFixed(2)} Billion USD</li>
                     <ul> 
                     `);
@@ -216,16 +239,6 @@ class TreeMapBarChart {
                     d3.select('#tooltip').style('display', 'none');
                 })
         }
-
-
-
-        vis.xAxisG
-            .call(vis.xAxis)
-            .call(g => g.select('.domain').remove());
-
-        vis.yAxisG
-            .call(vis.yAxis)
-            .call(g => g.select('.domain').remove());
     }
 
 }
