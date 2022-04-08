@@ -71,8 +71,7 @@ function initViews() {
 
     // Geomap
     geomap = new ChoroplethMap({
-        parentElement: '#geomap',
-        containerWidth: 600
+        parentElement: '#geomap'
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
     // init scatterplot/tree map based on mode
@@ -95,17 +94,18 @@ function initViews() {
 
 function initDispatchers() {
     dispatcher.on('updateCountry', countries_id => {
-        console.log(countries_id);
+        //console.log(countries_id);
         countriesSelected = countries_id;
-        // TODO: change in treeMap barchart
         updateDisplayedCountries();
+        determineMode();
     });
 
     dispatcher.on('updateTime', s => {
-        updateDisplayedCountries();
         selectedTime = s;
         timeFilteredData = data["rollupForceData"][selectedTime];
         console.log(timeFilteredData);
+
+        updateDisplayedCountries();
 
         overview.data = timeFilteredData;
         overview.updateVis();
@@ -158,22 +158,25 @@ async function updateCountryCheckbox() {
     countries.clear();
     //console.log(timeFilteredData["node"]);
     timeFilteredData["node"].forEach(item => countries.add(item.id));
+    countriesSelected = countriesSelected.filter(d => Array.from(countries).includes(d));
 
     //console.log(countries);
     const myPromise = new Promise((resolve, reject) => {
         var countryHTML = "";
-        let checked = "";
-        let stillChecked = 0;
+        var checked = "";
+        //let stillChecked = 0; // probably dont need to consider for the edge case here 
         Array.from(countries).sort().forEach(val => {
-            if(countriesSelected.includes(val)) {checked = "checked"; stillChecked += 1;} else {checked = "";};
+            if(countriesSelected.includes(val)) {checked = "checked"; 
+                // stillChecked += 1;
+            } else {checked = "";};
             countryHTML += `
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`>
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`> 
             <label class="form-check-label" for="flexCheckDefault">` + id2name[val] + ` </label>
         </div>
     `
         });
-        if (stillChecked == 0) uncheckAll();
+        //if (stillChecked == 0) uncheckAll(); // probably dont need to consider for the edge case here 
         resolve(countryHTML);
     })
     myPromise.then(v => {
@@ -184,6 +187,7 @@ async function updateCountryCheckbox() {
 // Check 5 countries
 function checkAll() {
     const sel = d3.selectAll('.form-check-input');
+    sel.property('checked', false);
     console.log(sel);
     countriesSelected = [];
     var randomIndexes = [];

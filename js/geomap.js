@@ -8,7 +8,7 @@ class ChoroplethMap {
     constructor(_config, _world_data, _value_data, _export_import, _selected_country_id, _dispatcher) {
       this.config = {
         parentElement: _config.parentElement,
-        containerWidth: _config.containerWidth || 1000,
+        containerWidth: _config.containerWidth || 800,
         containerHeight: _config.containerHeight || 500,
         margin: _config.margin || {top: 0, right: 20, bottom: 0, left: 0},
         tooltipPadding: 10,
@@ -201,9 +201,9 @@ class ChoroplethMap {
       vis.legendRect.attr('fill', 'url(#legend-gradient)');
 
       var zoom = d3.zoom()
-          .scaleExtent([1, 6])
+          .scaleExtent([0.7, 6])
           .on('zoom', e => {
-            console.log(e);
+            //console.log(e);
             vis.strokeWidth = 1.7/e.transform.k;
             vis.chart.selectAll('.country')
               .attr('transform', e.transform)

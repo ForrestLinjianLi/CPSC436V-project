@@ -24,7 +24,10 @@
 
 .row {
     padding: 10px;
+    display: grid;
+    grid-template-columns: auto auto;
 }
+
 
 #filter-container {
     width: 100%;
