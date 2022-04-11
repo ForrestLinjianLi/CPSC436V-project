@@ -46,7 +46,7 @@ class TreeMapBarChart {
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
-            .attr('width', vis.config.containerWidth)
+            .attr('width', "100%")
             .attr('height', vis.config.containerHeight);
 
 
@@ -89,7 +89,7 @@ class TreeMapBarChart {
         //append title
         vis.svg.append('text')
             .attr('id', 'treeMapBarChartTitle')
-            .attr("x", 330)
+            .attr("x", "50%")
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .attr('font-size', '21px')

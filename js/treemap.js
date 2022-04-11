@@ -9,7 +9,7 @@ class TreeMap {
             parentElement: _config.parentElement,
             containerWidth:  _config.containerWidth || 1000,
             containerHeight: _config.containerHeight || 500,
-            margin: {top: 40, right: 20, bottom: 20, left: 20},
+            margin: {top: 40, right: 10, bottom: 20, left: 10},
             tooltipPadding: _config.tooltipPadding || 15
         }
         this.fullData = _data;
@@ -32,7 +32,7 @@ class TreeMap {
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
-            .attr('width', vis.config.containerWidth)
+            .attr('width', "100%")
             .attr('height', vis.config.containerHeight);
 
         let country;
@@ -43,7 +43,7 @@ class TreeMap {
         //append title
         vis.svg.append('text')
             .attr('id', 'treeMapTitle')
-            .attr("x", 350)
+            .attr("x", "50%")
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .attr('font-size', '21px')
@@ -116,12 +116,12 @@ class TreeMap {
             .data(root.leaves())
             .enter()
             .append("rect")
-            .attr("class", "treeBlock")
+            .attr("class", d => `treeBlock ${d.data.product}`)
             .attr('x', function (d) {return d.x0;})
             .attr('y', function (d) {return d.y0;})
             .attr('width', function (d) {return d.x1 - d.x0;})
             .attr('height', function (d) {return d.y1 - d.y0;})
-            .attr('fill', d => vis.productColorScale(d.data.product))
+            // .attr('fill', d => vis.productColorScale(d.data.product))
             .style("stroke", "black")
             .on("mouseover", (event, d) => {
                 // tooltip

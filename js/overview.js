@@ -9,14 +9,12 @@ class OverviewGraph {
             parentElement: _config.parentElement,
             containerWidth: 600,
             containerHeight: 800,
-            margin: {top: 25, right: 20, bottom: 20, left: 20},
+            margin: {top: 25, right: 5, bottom: 20, left: 5},
             tooltipPadding: _config.tooltipPadding || 15,
             maxNode: 30,
             defaultForce: 1000,
         }
         this.data = _data;
-        this.barChart = _barChart;
-        this.dispatcher = _dispatcher;
         this.initVis();
     }
 
@@ -30,7 +28,6 @@ class OverviewGraph {
         vis.config.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.config.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
-        // Initialize scales
         vis.opacityScale = d3.scaleLinear().range([0.1,1]);
         vis.lengthScale = d3.scaleLinear()
             .range([20, 70]);
@@ -40,8 +37,13 @@ class OverviewGraph {
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
-            .attr('width', vis.config.containerWidth)
+            .attr('width', "90%")
             .attr('height', vis.config.containerHeight);
+
+        let transform;
+        const zoom = d3.zoom().on("zoom", e => {
+            vis.chart.attr("transform", (transform = e.transform));
+        });
 
         // Append group element that will contain our actual chart
         // and position it according to the given margin config
@@ -58,18 +60,6 @@ class OverviewGraph {
             .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2));
 
         vis.patterns = vis.chart.append('defs');
-        let yearSlider = d3
-            .sliderBottom()
-            .domain([1995, 2017])
-            .default(selectedTime)
-            .tickFormat(d => d + "")
-            .ticks(10)
-            .width(500)
-            .step(1)
-            // .displayValue(false)
-            .on('onchange', (val) => {
-                vis.dispatcher.call('updateTime', {}, parseInt(val));
-            });
 
         vis.numberSlider = d3
             .sliderBottom()
@@ -85,38 +75,25 @@ class OverviewGraph {
 
         let forceSlider = d3
             .sliderBottom()
-            .domain([0, 1000])
-            .ticks(10)
+            .domain([0.1 , 2])
             .width(500)
-            .step(100)
-            // .displayValue(false)
-            .default(vis.config.defaultForce)
+            .step((2 - 0.1) / 100)
+            .default(1)
             .on('onchange', (val) => {
-                let vis = this;
-                vis.simulation.force('charge', d3.forceManyBody()
-                    .strength(val))
-                    .restart();
+                zoom.scaleTo(vis.chart, val);
             });
 
         vis.svg.append('text')
             .attr('id', 'relation-graph-title')
-            .attr("x", vis.config.width/2)
+            .attr("x", "50%")
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .attr('font-size', '21px')
             .attr('font-weight', 'bold')
 
-        d3.select('#year-slider')
-            .append('svg')
-            .attr('width', vis.config.width)
-            .attr('height', 50)
-            .append('g')
-            .attr('transform', `translate(30, 15)`)
-            .call(yearSlider);
-
         d3.select('#number-slider')
             .append('svg')
-            .attr('width', vis.config.width)
+            .attr('width', "100%")
             .attr('height', 50)
             .append('g')
             .attr('transform', `translate(30, 15)`)
@@ -124,12 +101,16 @@ class OverviewGraph {
 
         d3.select('#force-slider')
             .append('svg')
-            .attr('width', vis.config.width)
+            .attr('width', "100%")
             .attr('height', 50)
             .append('g')
             .attr('transform', `translate(30,15)`)
             .call(forceSlider);
 
+        d3.selectAll('.slider text').attr('dy', '0.35em');
+
+        vis.svg.call(zoom)
+            .call(zoom.transform, d3.zoomIdentity);
         vis.updateVis();
     }
 
@@ -145,8 +126,11 @@ class OverviewGraph {
         vis.lengthScale.domain([1, d3.max(vis.data.node, d=>d.partner_num)]);
         // Add node-link data to simulation
         vis.simulation.nodes(vis.filteredNode);
-        vis.simulation.force('link').links(vis.filteredLink).distance(100);
-        vis.simulation.force('collide',d3.forceCollide().radius(vis.radiusScale(vis.data.node.length)).iterations(2));
+        vis.simulation.force('link').links(vis.filteredLink);
+        vis.simulation.force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
+        vis.simulation.force('collide',d3.forceCollide().radius(vis.radiusScale(vis.data.node.length)).iterations(2))
+            .velocityDecay(0.5)
+            .alphaTarget(0.1);
         d3.select("#relation-graph-title").text(`The Primary Trading Countries in ${selectedTime}`);
         vis.renderVis();
     }
@@ -180,6 +164,18 @@ class OverviewGraph {
             .on('mouseleave',(event, d) => {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', false);
                 d3.select('#link-tooltip').style('display', 'none');
+            })
+            .on('click',(event, d) => {
+                let temp = new Set(countriesSelected);
+                if (temp.has(d.target.id) && temp.has(d.source.id)) {
+                    temp.delete(d.target.id);
+                    temp.delete(d.source.id);
+                } else {
+                    temp.add(d.target.id);
+                    temp.add(d.source.id);
+                }
+                countriesSelected = Array.from(temp);
+                dispatcher.call('updateCountry', event, countriesSelected);
             });
 
         vis.patterns.selectAll('pattern').data(vis.filteredNode).join('pattern')
@@ -196,6 +192,7 @@ class OverviewGraph {
             .attr("x", 0)
             .attr("y", 0)
             .attr("preserveAspectRatio", "xMidYMid slice");
+
 
         const nodes = vis.nodes.selectAll('.node').data(vis.filteredNode, d=> d.id)
             .join('circle')
@@ -221,12 +218,22 @@ class OverviewGraph {
                 d3.select('#node-tooltip').style('display', 'none');
             })
             .on('click', function (event, d) {
-                const isHighlighted = d3.select(this).classed('highlight');
-                d3.selectAll('.link-'+d.id).classed('highlight', !isHighlighted);
-                d3.select(this).classed('highlight', !isHighlighted);
+                let temp = new Set(countriesSelected);
+                if (temp.has(d.id)) {
+                    temp.delete(d.id);
+                    countriesSelected = Array.from(temp);
+                } else {
+                    countriesSelected.push(d.id);
+                }
+                dispatcher.call('updateCountry', event, countriesSelected);
+            }).on("dblclick.zoom", function(d) { d3.event.stopPropagation();
+                var dcx = (window.innerWidth/2-d.x*zoom.scale());
+                var dcy = (window.innerHeight/2-d.y*zoom.scale());
+                vis.zoom.translate([dcx,dcy]);
+                vis.nodes.attr("transform", "translate("+ dcx + "," + dcy  + ")scale(" + vis.zoom.scale() + ")");
             });
         // Update positions
-        vis.simulation.on('tick', () => {
+        vis.simulation.on('tick', (e) => {
             links
                 .attr('x1', d => d.source.x)
                 .attr('y1', d => d.source.y)
@@ -264,4 +271,5 @@ function drag(simulation) {
         .on("drag", dragged)
         .on("end", dragended);
 }
+
 

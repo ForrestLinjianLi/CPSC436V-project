@@ -8,7 +8,7 @@ let id2name = {};
 let name2id = {};
 
 // Figures
-let overview, treemap, geomap, scatterplot, barChart, treeMapBarchat;
+let overview, treemap, geomap, scatterplot, barChart;
 //Data
 let data, timeFilteredData;
 
@@ -67,11 +67,13 @@ function initViews() {
     // Relation graph
     overview = new OverviewGraph({
         parentElement: '#overview',
+        containerWidth: 800,
     }, timeFilteredData, barChart, dispatcher);
 
     // Geomap
     geomap = new ChoroplethMap({
-        parentElement: '#geomap'
+        parentElement: '#geomap',
+        containerWidth: 1000,
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
     // init scatterplot/tree map based on mode
@@ -80,17 +82,39 @@ function initViews() {
     // add button listeners
     document.getElementsByClassName("btn-group ")[0].addEventListener('click', (e) => {
         export_import = e.target.innerText.toLowerCase();
+        relationNodeFocus();
         updateGeomap();
         determineMode();
     });
+
+    let yearSlider = d3
+        .sliderBottom()
+        .domain([1995, 2017])
+        .default(selectedTime)
+        .tickFormat(d => d + "")
+        .ticks(10)
+        .width(900)
+        .step(1)
+        // .displayValue(false)
+        .on('onchange', (val) => {
+            dispatcher.call('updateTime', {}, parseInt(val));
+        });
+    d3.select('#year-slider')
+        .append('svg')
+        .attr('width', 1000)
+        .attr('height', 100)
+        .append('g')
+        .attr('transform', `translate(30, 15)`)
+        .call(yearSlider);
 }
 
 
 function initDispatchers() {
     dispatcher.on('updateCountry', countries_id => {
-        //console.log(countries_id);
         countriesSelected = countries_id;
         updateDisplayedCountries();
+        relationNodeFocus();
+        updateGeomap();
         determineMode();
     });
 
@@ -103,7 +127,7 @@ function initDispatchers() {
 
         overview.data = timeFilteredData;
         overview.updateVis();
-
+        relationNodeFocus();
         updateGeomap();
         determineMode();
     })
@@ -129,8 +153,7 @@ function updateDisplayedCountries() {
                     } else {
                         countriesSelected = countriesSelected.filter(d => d != name2id[label]);
                     }
-                    //console.log(label);
-                    // console.log(elem.parentNode);
+                    relationNodeFocus();
                     updateGeomap();
                     determineMode();
                 });
@@ -146,6 +169,21 @@ function updateGeomap() {
     geomap.selected_country_id = countriesSelected;
     geomap.value_data = timeFilteredData;
     geomap.updateVis();
+}
+
+function relationNodeFocus() {
+    if (countriesSelected.length > 0) {
+        d3.selectAll('.node').classed('highlight', false).style('opacity', 0.35);
+        d3.selectAll('.link').classed('highlight', false);
+        countriesSelected.forEach(c => {
+            let node = d3.select(`#node-${c}`).classed('highlight', true).style('opacity', 1);
+            d3.selectAll(`.link-${c}`).classed('highlight', true);
+        });
+    } else {
+        d3.selectAll('.node').classed('highlight', false).style('opacity', 1);
+    }
+
+
 }
 
 async function updateCountryCheckbox() {
@@ -178,10 +216,6 @@ async function updateCountryCheckbox() {
     })
 }
 
-function aaa(){
-    console.log('eeeeee');
-}
-
 // Check 5 countries
 function checkAll() {
     const sel = d3.selectAll('.form-check-input');
@@ -197,6 +231,7 @@ function checkAll() {
         sel._groups[0][d].checked = true;
         countriesSelected.push(name2id[sel._groups[0][d].parentElement.outerText]);
     });
+    relationNodeFocus();
     updateGeomap();
     determineMode();
 }
@@ -209,6 +244,7 @@ function uncheckAll() {
     sel._groups[0][randomIndex].checked = true;
     countriesSelected = [name2id[sel._groups[0][randomIndex].parentElement.outerText]];
     updateGeomap();
+    relationNodeFocus();
     determineMode();
 }
 
@@ -222,7 +258,7 @@ function determineMode(){
         document.getElementById('modeTitle').innerHTML = "Exploration Mode";
         treemap = new TreeMap({
             parentElement: '#scatter',
-            containerWidth: 1200
+            containerWidth: 1000
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
@@ -231,7 +267,7 @@ function determineMode(){
         document.getElementById('modeTitle').innerHTML = "Overview Mode";
         scatterplot = new TreeMapBarChart({
             parentElement: '#scatter',
-            containerWidth: 1200
+            containerWidth: 1000
         }, data["mergedRawData"]);
     }
 }
