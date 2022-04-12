@@ -9,7 +9,7 @@ class TreeMap {
             parentElement: _config.parentElement,
             containerWidth:  _config.containerWidth || 1000,
             containerHeight: _config.containerHeight || 500,
-            margin: {top: 40, right: 10, bottom: 20, left: 10},
+            margin: {top: 40, right: 20, bottom: 20, left: 20},
             tooltipPadding: _config.tooltipPadding || 15
         }
         this.fullData = _data;
