@@ -8,7 +8,7 @@ let id2name = {};
 let name2id = {};
 
 // Figures
-let overview, treemap, geomap, scatterplot, barChart;
+let overview, treemap, geomap, treeMapBarChart, barChart;
 //Data
 let data, timeFilteredData;
 
@@ -78,7 +78,7 @@ function initViews() {
         containerHeight: 638,
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
-    // init scatterplot/tree map based on mode
+    // init treeMapBarChart/tree map based on mode
     determineMode();
 
     // add button listeners
@@ -262,7 +262,7 @@ function determineMode(){
         // overview mode
         d3.select("#out").attr("background", "#f0f3f5"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");
-        scatterplot = new TreeMapBarChart({
+        treeMapBarChart = new TreeMapBarChart({
             parentElement: '#scatter',
             containerWidth: 1180
         }, data["mergedRawData"]);
