@@ -73,7 +73,7 @@ class OverviewGraph {
             .sliderBottom()
             .domain([0.1 , 2])
             .width(500)
-            .step((2 - 0.1) / 100)
+            .step((2 - 0.1) / 20)
             .default(1)
             .on('onchange', (val) => {
                 zoom.scaleTo(vis.chart, val);
