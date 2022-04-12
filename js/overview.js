@@ -40,11 +40,6 @@ class OverviewGraph {
             .attr('width', "100%")
             .attr('height', vis.config.containerHeight);
 
-        let transform;
-        const zoom = d3.zoom().on("zoom", e => {
-            vis.chart.attr("transform", (transform = e.transform));
-        });
-
         // Append group element that will contain our actual chart
         // and position it according to the given margin config
         vis.chart = vis.svg.append('g')
@@ -74,7 +69,7 @@ class OverviewGraph {
                 dispatcher.call('updateCountry', event, countriesSelected);
             });
 
-        let forceSlider = d3
+        vis.forceSlider = d3
             .sliderBottom()
             .domain([0.1 , 2])
             .width(500)
@@ -106,9 +101,17 @@ class OverviewGraph {
             .attr('height', 50)
             .append('g')
             .attr('transform', `translate(30,15)`)
-            .call(forceSlider);
+            .call(vis.forceSlider);
 
         d3.selectAll('.slider text').attr('dy', '0.35em');
+
+        let transform;
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 2])
+            .on("zoom", e => {
+                vis.chart.attr("transform", (transform = e.transform));
+                vis.forceSlider.value(e.transform.k);
+            });
 
         vis.svg.call(zoom)
             .call(zoom.transform, d3.zoomIdentity);
