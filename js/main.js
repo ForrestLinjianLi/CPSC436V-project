@@ -259,7 +259,7 @@ function determineMode(){
         d3.select("#scatter").html("");
         treemap = new TreeMap({
             parentElement: '#scatter',
-            containerWidth: 1000
+            containerWidth: 1180
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
@@ -267,7 +267,7 @@ function determineMode(){
         d3.select("#scatter").html("");
         scatterplot = new TreeMapBarChart({
             parentElement: '#scatter',
-            containerWidth: 1000
+            containerWidth: 1180
         }, data["mergedRawData"]);
     }
 }

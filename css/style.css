@@ -206,8 +206,8 @@ h1 {
 
 @font-face {
     font-family: "Header";   /*Can be any text*/
-    src: local("RubikMoonrocks-Regular"),
-    url("./font/RubikMoonrocks-Regular.ttf") format("truetype");
+    src: local("JosefinSans-Bold"),
+    url("./font/JosefinSans-Bold.ttf") format("truetype");
 }
 
 @font-face {

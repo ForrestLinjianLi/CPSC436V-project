@@ -66,6 +66,14 @@ class ChoroplethMap {
 
       vis.strokeWidth = 2.2;
 
+    vis.svg.append('text')
+        .attr('id', 'geomap-title')
+        .attr("x", "50%")
+        .attr("y", 20)
+        .attr("text-anchor", "middle")
+        .attr('font-size', '21px')
+        .attr('font-weight', 'bold')
+
       vis.updateVis();
     }
   
@@ -87,8 +95,9 @@ class ChoroplethMap {
         .range([vis.c1, vis.c2])
         .interpolate(d3.interpolateHcl);
 
- 
-      const extent = d3.extent(vis.data.features, d => d.properties.value);
+        d3.select("#geomap-title").text(`The Net ${vis.export_import} Value of Countries in ${selectedTime}`);
+
+        const extent = d3.extent(vis.data.features, d => d.properties.value);
 
       // Update color scale
       vis.colorScale.domain(d3.extent(vis.data.features, d => d.properties.value));
