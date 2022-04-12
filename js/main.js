@@ -54,6 +54,7 @@ Promise.all([
     data["category"] = data["category"].map(d => d.hs_product_name_short_en);
 
     initViews();
+    relationNodeFocus();
     initDispatchers();
 })
 
@@ -189,23 +190,23 @@ function relationNodeFocus() {
 
 async function updateCountryCheckbox() {
     countries.clear();
-    //console.log(timeFilteredData["node"]);
-    timeFilteredData["node"].forEach(item => countries.add(item.id));
+    let countryNames = new Set();
+    timeFilteredData["node"].forEach(function (item) {
+        countries.add(item.id);
+        countryNames.add(id2name[item.id]);
+    });
     countriesSelected = countriesSelected.filter(d => Array.from(countries).includes(d));
 
-    //console.log(countries);
     const myPromise = new Promise((resolve, reject) => {
         var countryHTML = "";
         var checked = "";
-        //let stillChecked = 0; // probably dont need to consider for the edge case here 
-        Array.from(countries).sort().forEach(val => {
+        Array.from(countryNames).sort().forEach(val => {
             if(countriesSelected.includes(val)) {checked = "checked"; 
-                // stillChecked += 1;
-            } else {checked = "";};
+            } else {checked = "";}
             countryHTML += `
         <div class="form-check">
             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`> 
-            <label class="form-check-label" for="flexCheckDefault">` + id2name[val] + ` </label>
+            <label class="form-check-label" for="flexCheckDefault">` + val + ` </label>
         </div>
     `
         });

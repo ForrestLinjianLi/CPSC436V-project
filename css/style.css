@@ -1,9 +1,12 @@
 h1  {
     font-family: Header, serif;
-
 }
 body > *{
     font-family: Light, serif;
+}
+body {
+    width: 1500px;
+    height: 1500px;
 }
 
 .view {
@@ -68,7 +71,7 @@ text {
 }
 
 #country-filter {
-    height: inherit;
+    height: 1000px;
     overflow: scroll;
 }
 

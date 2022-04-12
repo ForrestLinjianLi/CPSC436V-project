@@ -193,6 +193,7 @@ class OverviewGraph {
             .attr("y", 0)
             .attr("preserveAspectRatio", "xMidYMid slice");
 
+        vis.chart.on("click", )
 
         const nodes = vis.nodes.selectAll('.node').data(vis.filteredNode, d=> d.id)
             .join('circle')
