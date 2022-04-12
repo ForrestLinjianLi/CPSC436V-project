@@ -72,7 +72,7 @@ class OverviewGraph {
             .sliderBottom()
             .domain([0.1 , 2])
             .width(vis.config.containerWidth/2)
-            .step(0.1)
+            .step(0.2)
             .default(1)
             .on('onchange', (val) => {
                 zoom.scaleTo(vis.chart, val);
@@ -124,7 +124,6 @@ class OverviewGraph {
             });
         vis.svg.call(zoom)
             .call(zoom.transform, d3.zoomIdentity);
-
 
         vis.updateVis();
     }
