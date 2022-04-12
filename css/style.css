@@ -18,6 +18,10 @@ body {
     dy: 0.41em;
 }
 
+svg > g > g.slider > g > text {
+    font-size: medium;
+}
+
 .axis--grid .domain {
     fill: #ddd;
     stroke: none;

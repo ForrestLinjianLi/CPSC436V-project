@@ -201,7 +201,7 @@ async function updateCountryCheckbox() {
         var countryHTML = "";
         var checked = "";
         Array.from(countryNames).sort().forEach(val => {
-            if(countriesSelected.includes(val)) {checked = "checked"; 
+            if(countriesSelected.includes(name2id[val])) {checked = "checked";
             } else {checked = "";}
             countryHTML += `
         <div class="form-check">
@@ -210,7 +210,6 @@ async function updateCountryCheckbox() {
         </div>
     `
         });
-        //if (stillChecked == 0) uncheckAll(); // probably dont need to consider for the edge case here 
         resolve(countryHTML);
     })
     myPromise.then(v => {
@@ -251,9 +250,7 @@ function uncheckAll() {
 }
 
 function determineMode(){
-    console.log("determine mode...")
-    console.log(countriesSelected)
-    if(countriesSelected.length == 1) {
+    if(countriesSelected.length <= 1) {
         // exploration mode
         d3.select("#out").attr("background", "#a7ebbb"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");

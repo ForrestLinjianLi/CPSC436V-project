@@ -193,7 +193,11 @@ class OverviewGraph {
             .attr("y", 0)
             .attr("preserveAspectRatio", "xMidYMid slice");
 
-        vis.chart.on("click", )
+        vis.svg.on("click", function (event) {
+            if (event.target.className.baseVal === '') {
+                dispatcher.call('updateCountry', event, []);
+            }
+        });
 
         const nodes = vis.nodes.selectAll('.node').data(vis.filteredNode, d=> d.id)
             .join('circle')
