@@ -8,7 +8,7 @@ class OverviewGraph {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: 600,
-            containerHeight: 800,
+            containerHeight: 500,
             margin: {top: 25, right: 5, bottom: 20, left: 5},
             tooltipPadding: _config.tooltipPadding || 15,
             maxNode: 30,
@@ -37,7 +37,7 @@ class OverviewGraph {
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
-            .attr('width', "90%")
+            .attr('width', "100%")
             .attr('height', vis.config.containerHeight);
 
         let transform;

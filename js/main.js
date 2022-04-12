@@ -74,6 +74,7 @@ function initViews() {
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
         containerWidth: 1000,
+        containerHeight: 638,
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
     // init scatterplot/tree map based on mode
