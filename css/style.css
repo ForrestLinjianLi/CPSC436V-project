@@ -120,6 +120,11 @@ h1 {
     stroke-width: 4;
 }
 
+#filter-container > div.btn-group.btn-group-toggle > label.btn.btn-primary.active {
+    border-color: black;
+    border-width: 2px;
+}
+
 /* TODO: Might need to change later */
 .country:hover {
     opacity: 0.8;
