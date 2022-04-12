@@ -5,8 +5,10 @@ body > *{
     font-family: Light, serif;
 }
 body {
-    width: 1500px;
-    height: 1500px;
+    width: 100vw;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
 }
 
 .view {

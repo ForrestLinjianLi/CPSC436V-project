@@ -12,7 +12,6 @@ class OverviewGraph {
             margin: {top: 25, right: 5, bottom: 20, left: 5},
             tooltipPadding: _config.tooltipPadding || 15,
             maxNode: 30,
-            defaultForce: 1000,
         }
         this.data = _data;
         this.initVis();
@@ -51,7 +50,7 @@ class OverviewGraph {
         // Initialize force simulation
         vis.simulation = d3.forceSimulation()
             .force('link', d3.forceLink().id(d => d.id))
-            .force('charge', d3.forceManyBody().strength(vis.config.defaultForce))
+            .force('charge', d3.forceManyBody().strength(50))
             .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2));
 
         vis.patterns = vis.chart.append('defs');
@@ -112,7 +111,6 @@ class OverviewGraph {
                 vis.chart.attr("transform", (transform = e.transform));
                 vis.forceSlider.value(e.transform.k);
             });
-
         vis.svg.call(zoom)
             .call(zoom.transform, d3.zoomIdentity);
         vis.updateVis();
