@@ -255,7 +255,6 @@ function determineMode(){
         // exploration mode
         d3.select("#out").attr("background", "#a7ebbb"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");
-        document.getElementById('modeTitle').innerHTML = "Exploration Mode";
         treemap = new TreeMap({
             parentElement: '#scatter',
             containerWidth: 1000
@@ -264,7 +263,6 @@ function determineMode(){
         // overview mode
         d3.select("#out").attr("background", "#f0f3f5"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");
-        document.getElementById('modeTitle').innerHTML = "Overview Mode";
         scatterplot = new TreeMapBarChart({
             parentElement: '#scatter',
             containerWidth: 1000
