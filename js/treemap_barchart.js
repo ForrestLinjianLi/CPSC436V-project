@@ -191,7 +191,7 @@ class TreeMapBarChart {
                 .data(vis.roots[i].leaves())
                 .enter()
                 .append("rect")
-                .attr("class", "rect")
+                .attr("class", d => `rect ${d.data.product}`)
                 // TODO: change the x-axis position for each bar
                 .attr('transform', `translate(${vis.xScale(vis.roots[i].data.country)}, ${vis.yScale(vis.roots[i].value)-4})`)
                 .attr('x', function (d) {return d.x0;})
