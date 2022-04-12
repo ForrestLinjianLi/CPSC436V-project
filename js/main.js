@@ -68,7 +68,8 @@ function initViews() {
     // Relation graph
     overview = new OverviewGraph({
         parentElement: '#overview',
-        containerWidth: 800,
+        containerWidth: 510,
+        containerHeight: 570,
     }, timeFilteredData, barChart, dispatcher);
 
     // Geomap
@@ -84,6 +85,7 @@ function initViews() {
     // add button listeners
     document.getElementsByClassName("btn-group ")[0].addEventListener('click', (e) => {
         export_import = e.target.innerText.toLowerCase();
+        overview.updateVis();
         relationNodeFocus();
         updateGeomap();
         determineMode();
@@ -124,7 +126,6 @@ function initDispatchers() {
         selectedTime = s;
         timeFilteredData = data["rollupForceData"][selectedTime];
         console.log(timeFilteredData);
-
         updateDisplayedCountries();
 
         overview.data = timeFilteredData;
@@ -240,10 +241,8 @@ function checkAll() {
 // uncheck to 1 country
 function uncheckAll() {
     const sel = d3.selectAll('.form-check-input');
-    const randomIndex = Math.floor(Math.random() * sel._groups[0].length);
     sel.property('checked', false);
-    sel._groups[0][randomIndex].checked = true;
-    countriesSelected = [name2id[sel._groups[0][randomIndex].parentElement.outerText]];
+    countriesSelected = [];
     updateGeomap();
     relationNodeFocus();
     determineMode();
@@ -256,7 +255,7 @@ function determineMode(){
         d3.select("#scatter").html("");
         treemap = new TreeMap({
             parentElement: '#scatter',
-            containerWidth: 1180
+            containerWidth: 1400
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
@@ -264,7 +263,7 @@ function determineMode(){
         d3.select("#scatter").html("");
         scatterplot = new TreeMapBarChart({
             parentElement: '#scatter',
-            containerWidth: 1180
+            containerWidth: 1400
         }, data["mergedRawData"]);
     }
 }

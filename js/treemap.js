@@ -72,6 +72,10 @@ class TreeMap {
                 : country + " Import Value Distribution by Product in " + selectedTime);
         }
 
+        if (countriesSelected.length == 0) {
+            d3.select("#treeMapTitle").text("Please Select A Country to Show The Tree Map");
+        }
+
         // Specificy accessor functions
         vis.productColorScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other"]);
         vis.renderVis();

@@ -7,9 +7,9 @@ class OverviewGraph {
     constructor(_config, _data, _barChart, _dispatcher) {
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: 600,
-            containerHeight: 500,
-            margin: {top: 25, right: 5, bottom: 20, left: 5},
+            containerWidth: _config.containerWidth || 600,
+            containerHeight:  _config.containerHeight || 500,
+            margin: {top: 40, right: 5, bottom: 20, left: 5},
             tooltipPadding: _config.tooltipPadding || 15,
             maxNode: 15,
         }
@@ -41,8 +41,21 @@ class OverviewGraph {
 
         // Append group element that will contain our actual chart
         // and position it according to the given margin config
-        vis.chart = vis.svg.append('g')
+        vis.chartArea = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
+        // Initialize clipping mask that covers the whole chart
+        vis.chartArea.append('defs')
+            .append('clipPath')
+            .attr('id', 'chart-mask')
+            .append('rect')
+            .attr('width', vis.config.width)
+            .attr('y', -vis.config.margin.top)
+            .attr('height', vis.config.height);
+
+        // Append group element that will contain our actual chart
+        // and position it according to the given margin config
+        vis.chart = vis.chartArea.append('g')
+            .attr('transform', `translate(${vis.config.containerWidth/2},${vis.config.containerHeight/2})`);
 
         vis.links = vis.chart.append('g');
         vis.nodes = vis.chart.append('g');
@@ -58,7 +71,7 @@ class OverviewGraph {
         vis.numberSlider = d3
             .sliderBottom()
             .domain([0,30])
-            .width(500)
+            .width(vis.config.containerWidth/2)
             .step(2)
             .default(10)
             // .displayValue(false)
@@ -71,8 +84,8 @@ class OverviewGraph {
         vis.forceSlider = d3
             .sliderBottom()
             .domain([0.1 , 2])
-            .width(500)
-            .step((2 - 0.1) / 20)
+            .width(vis.config.containerWidth/2)
+            .step(0.1)
             .default(1)
             .on('onchange', (val) => {
                 zoom.scaleTo(vis.chart, val);
@@ -104,6 +117,17 @@ class OverviewGraph {
 
         d3.selectAll('.slider text').attr('dy', '0.35em');
 
+        // Add legend labels
+        // Append legend
+        vis.legend = vis.svg.append('g')
+            .attr('class', 'legend')
+            //.attr('transform', `translate(${vis.width - vis.config.legendLeft- 100},${ vis.config.legendBottom})`);
+            .attr('transform', `translate(${vis.config.margin.left},${vis.config.containerHeight-30})`);
+
+        vis.legendRect = vis.legend.append('rect')
+            .attr('width', 200)
+            .attr('height', 10);
+
         let transform;
         const zoom = d3.zoom()
             .scaleExtent([0.1, 2])
@@ -113,6 +137,8 @@ class OverviewGraph {
             });
         vis.svg.call(zoom)
             .call(zoom.transform, d3.zoomIdentity);
+
+
         vis.updateVis();
     }
 
@@ -131,10 +157,8 @@ class OverviewGraph {
         vis.simulation.nodes(vis.filteredNode);
         vis.simulation.force('link').links(vis.filteredLink);
         vis.simulation.force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
-        vis.simulation.force('collide',d3.forceCollide()
-            .radius(vis.radiusScale(vis.data.node.length)))
-            .velocityDecay(0.5)
-            .alphaTarget(0.1);
+        vis.simulation.force('collide',d3.forceCollide(d => 65)
+            .radius(vis.radiusScale(vis.data.node.length)));
         d3.select("#relation-graph-title").text(`The Primary Trading Countries in ${selectedTime}`);
         vis.renderVis();
     }
@@ -150,8 +174,9 @@ class OverviewGraph {
             .data(vis.filteredLink, d => [d.source, d.target])
             .join('line')
             .attr('class', d => `link link-${d.source.id} link-${d.target.id}`)
-            .attr('stroke-width', 2)
+            .attr('stroke-width', 5)
             .attr('opacity', d => vis.opacityScale(d.value))
+            .attr('stroke', '#750000')
             .on('mouseover',(event, d) => {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', true);
                 d3.select('#link-tooltip')
@@ -161,7 +186,7 @@ class OverviewGraph {
                     .html(`
                       <div class="tooltip-title">${d.target.id} - ${d.source.id}</div>
                       <ul>
-                        <li>Overall Trading Amount: ${d.value}</li>
+                        <li>Overall Trading Amount: ${(d.value / 10000000000).toFixed(2)} billion</li>
                       </ul>
                     `);
             })
@@ -210,7 +235,6 @@ class OverviewGraph {
             .attr("fill", d => `url(#${d.id}-icon)`)
             .attr('stroke', 'black')
             .attr('r', d => vis.lengthScale(d.partner_num)/2)
-            // .attr('ry', d=> vis.lengthScale(d.partner_num))
             .call(drag(vis.simulation))
             .on('mouseover', (event, d) => {
                 d3.selectAll('.link-'+d.id).classed('hover', true);
@@ -218,8 +242,8 @@ class OverviewGraph {
                     .style('display', 'block')
                     .style('left', (event.pageX + vis.config.tooltipPadding) + 'px')
                     .style('top', (event.pageY + vis.config.tooltipPadding) + 'px');
-                d3.select("#tooltip-content").text(`Number of primary trading partners: ${d.partner_num/2}`)
-                d3.select("#tooltip-title").text(`${d.id}`)
+                d3.select("#tooltip-content").style('font-size', '15px').text(`Number of primary trading partners: ${d.partner_num/2}`)
+                d3.select("#tooltip-title").style('font-size', '20px').text(`${id2name[d.id]}`)
                 dispatcher.call("updateRelationBarChart", event, d);
             })
             .on('mouseleave', (event, d) => {
@@ -235,11 +259,6 @@ class OverviewGraph {
                     countriesSelected.push(d.id);
                 }
                 dispatcher.call('updateCountry', event, countriesSelected);
-            }).on("dblclick.zoom", function(d) { d3.event.stopPropagation();
-                var dcx = (window.innerWidth/2-d.x*zoom.scale());
-                var dcy = (window.innerHeight/2-d.y*zoom.scale());
-                vis.zoom.translate([dcx,dcy]);
-                vis.nodes.attr("transform", "translate("+ dcx + "," + dcy  + ")scale(" + vis.zoom.scale() + ")");
             });
         // Update positions
         vis.simulation.on('tick', (e) => {
@@ -253,6 +272,45 @@ class OverviewGraph {
                 .attr('cx', d => d.x)
                 .attr('cy', d => d.y);
         });
+
+        // Define begin and end of the color gradient (legend)
+        vis.legendStops = [
+            { color: 'white', value: 0, offset: 0},
+            { color: "#750000", value: 1, offset: 100},
+        ];
+
+        vis.legend.selectAll('.legend-label')
+            .data(vis.legendStops)
+            .join('text')
+            .attr('class', 'legend-label')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '.25em')
+            .attr('y', 20)
+            .attr('x', (d,index) => {
+                return index == 0 ? 0 : 200;
+            })
+            .text(d => Math.round(d.value/(10**9)));
+
+        vis.legend.selectAll('.legend-title')
+            .data(export_import)
+            .join('text')
+            .attr('class', 'legend-title')
+            .attr('dy', '.25em')
+            .attr('y', -10)
+            .text(`Net Trading Value (USD$)`);
+
+        // Initialize gradient that we will later use for the legend
+        vis.linearGradient = vis.svg.append('defs').append('linearGradient')
+            .attr("id", "relation-legend-gradient");
+
+        // Update gradient for legend
+        vis.linearGradient.selectAll('stop')
+            .data(vis.legendStops)
+            .join('stop')
+            .attr('offset', d => d.offset)
+            .attr('stop-color', d => d.color);
+
+        vis.legendRect.attr('fill', 'url(#relation-legend-gradient)');
         vis.simulation.restart();
     }
 }
