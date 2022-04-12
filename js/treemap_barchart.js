@@ -42,7 +42,7 @@ class TreeMapBarChart {
             .range([0, vis.height]);
 
         // color scale for product type
-        vis.productColorScale = d3.scaleOrdinal(d3.schemeCategory10);
+        vis.productColorScale = d3.scaleOrdinal(d3.schemeTableau10);
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
@@ -191,7 +191,7 @@ class TreeMapBarChart {
                 .data(vis.roots[i].leaves())
                 .enter()
                 .append("rect")
-                .attr("class", d => `rect ${d.data.product}`)
+                .attr("class", "rect")
                 // TODO: change the x-axis position for each bar
                 .attr('transform', `translate(${vis.xScale(vis.roots[i].data.country)}, ${vis.yScale(vis.roots[i].value)-4})`)
                 .attr('x', function (d) {return d.x0;})

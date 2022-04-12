@@ -170,46 +170,6 @@ h1 {
     font-weight: bolder;
 }
 
-.Textiles {
-    fill: #003f5c;
-}
-
-.Agriculture {
-    fill:#2f4b7c;
-}
-
-.Stone {
-    fill: #665191;
-}
-
-.Minerals {
-    fill: #a05195;
-}
-
-.Metals {
-    fill: #d45087;
-}
-
-.Chemicals {
-    fill: #f95d6a;
-}
-
-.Vehicles {
-    fill: #ff7c43;
-}
-
-.Machinery {
-    fill: #ffa600;
-}
-
-.Electronics {
-    fill: #bcbd22;
-}
-
-.Other {
-    fill:#17becf;
-}
-
 @font-face {
     font-family: "Header";   /*Can be any text*/
     src: local("JosefinSans-Bold"),

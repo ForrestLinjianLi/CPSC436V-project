@@ -24,7 +24,7 @@ class TreeMap {
     initVis() {
         let vis = this;
 
-        vis.productColorScale = d3.scaleOrdinal(d3.schemeCategory10);
+        vis.productColorScale = d3.scaleOrdinal(d3.schemeTableau10);
 
         // Calculate inner chart size. Margin specifies the space around the actual chart.
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -116,12 +116,12 @@ class TreeMap {
             .data(root.leaves())
             .enter()
             .append("rect")
-            .attr("class", d => `treeBlock ${d.data.product}`)
+            .attr("class", "treeBlock")
             .attr('x', function (d) {return d.x0;})
             .attr('y', function (d) {return d.y0;})
             .attr('width', function (d) {return d.x1 - d.x0;})
             .attr('height', function (d) {return d.y1 - d.y0;})
-            // .attr('fill', d => vis.productColorScale(d.data.product))
+            .attr('fill', d => vis.productColorScale(d.data.product))
             .style("stroke", "black")
             .on("mouseover", (event, d) => {
                 // tooltip

@@ -28,6 +28,8 @@ class Barchart {
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
         // Initialize scales and axes
+        vis.productColorScale = d3.scaleOrdinal(d3.schemeTableau10);
+
         vis.xScale = d3.scaleLinear()
             .range([0, vis.width]);
 
@@ -97,8 +99,8 @@ class Barchart {
             .join('rect');
 
         bars.style('opacity', 1)
-            .attr('class', d => data["category"][d[0]])
             .attr('stroke', 'black')
+            .attr('fill', d => vis.productColorScale(data["category"][d[0]]))
             .classed('bar', true)
             .attr('y', d => vis.yScale(vis.yValue(d)))
             .attr('height', vis.yScale.bandwidth())

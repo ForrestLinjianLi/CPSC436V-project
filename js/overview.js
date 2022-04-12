@@ -11,7 +11,7 @@ class OverviewGraph {
             containerHeight: 500,
             margin: {top: 25, right: 5, bottom: 20, left: 5},
             tooltipPadding: _config.tooltipPadding || 15,
-            maxNode: 30,
+            maxNode: 15,
         }
         this.data = _data;
         this.initVis();
@@ -57,10 +57,10 @@ class OverviewGraph {
 
         vis.numberSlider = d3
             .sliderBottom()
-            .domain([1,vis.config.maxNode])
+            .domain([0,30])
             .width(500)
-            .step(1)
-            .default(vis.config.maxNode)
+            .step(2)
+            .default(10)
             // .displayValue(false)
             .on('onchange', (val) => {
                 vis.config.maxNode = val;
@@ -121,7 +121,8 @@ class OverviewGraph {
      */
     updateVis() {
         let vis = this;
-        let sorted = new Set(vis.data.node.slice().sort((a,b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode+1)));
+        let sorted = new Set(vis.data.node.slice().sort((a,b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode+1-countriesSelected.length)));
+        countriesSelected.forEach(c => sorted.add(c));
         vis.filteredNode = vis.data.node.filter(d=> sorted.has(d.id));
         vis.filteredLink = vis.data.link.filter(d => (sorted.has(d.target) && sorted.has(d.source) || sorted.has(d.target.id) && sorted.has(d.source.id)));
         vis.opacityScale.domain([d3.min(vis.data.link, d => d.value),d3.max(vis.data.link, d => d.value)])
@@ -130,7 +131,8 @@ class OverviewGraph {
         vis.simulation.nodes(vis.filteredNode);
         vis.simulation.force('link').links(vis.filteredLink);
         vis.simulation.force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
-        vis.simulation.force('collide',d3.forceCollide().radius(vis.radiusScale(vis.data.node.length)).iterations(2))
+        vis.simulation.force('collide',d3.forceCollide()
+            .radius(vis.radiusScale(vis.data.node.length)))
             .velocityDecay(0.5)
             .alphaTarget(0.1);
         d3.select("#relation-graph-title").text(`The Primary Trading Countries in ${selectedTime}`);
