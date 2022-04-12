@@ -12,8 +12,8 @@ class ChoroplethMap {
         containerHeight: _config.containerHeight || 500,
         margin: _config.margin || {top: 0, right: 20, bottom: 0, left: 0},
         tooltipPadding: 10,
-        legendBottom: 50,
-        legendLeft: 50,
+        legendBottom: 35,
+        legendLeft: 10,
         legendRectHeight: 12, 
         legendRectWidth: 150
       }
@@ -39,6 +39,7 @@ class ChoroplethMap {
       vis.svg = d3.select(vis.config.parentElement).append('svg')
           .attr('width', "100%")
           .attr('height', vis.config.containerHeight);
+
 
       // Append group element that will contain our actual chart 
       // and position it according to the given margin config
@@ -95,7 +96,7 @@ class ChoroplethMap {
         .range([vis.c1, vis.c2])
         .interpolate(d3.interpolateHcl);
 
-        d3.select("#geomap-title").text(`The Net ${vis.export_import} Value of Countries in ${selectedTime}`);
+        d3.select("#geomap-title").text(`The Net ${vis.export_import == "export"? "Export":"Import"} Value of Countries in ${selectedTime}`);
 
         const extent = d3.extent(vis.data.features, d => d.properties.value);
 
@@ -118,8 +119,6 @@ class ChoroplethMap {
       // Convert compressed TopoJSON to GeoJSON format
       //const countries = topojson.feature(vis.data, vis.data.objects.collection)
       const countries = vis.data;
-      // console.log(countries);
-      // console.log(countries.features[1].properties.export_value);
 
       // Defines the scale of the projection so that the geometry fits within the SVG area
       vis.projection.fitSize([vis.width, vis.height], countries);
@@ -134,7 +133,6 @@ class ChoroplethMap {
           .attr('stroke-width', `${vis.strokeWidth}px`)
           .attr('fill', d => {
             if (d.properties.value) {
-              //console.log(d.properties.export_value);
               return vis.colorScale(d.properties.value);
             } else {
               return "rgb(220,220,220)";
@@ -145,8 +143,6 @@ class ChoroplethMap {
 
       countryPath
           .on('mousemove', (event,d) => {
-            //console.log(vis.export_import);
-            //console.log(d);
             const value = d.properties.value ? `${vis.export_import} value: <strong>$${Math.round(d.properties.value/(10**9))}</strong> billion` : 'No data available'; 
             d3.select('#tooltip')
               .style('display', 'block')
@@ -198,7 +194,7 @@ class ChoroplethMap {
           .attr('class', 'legend-title')
           .attr('dy', '.35em')
           .attr('y', -10)
-          .text(`${vis.export_import} in billion (USD$)`);
+          .text(`${vis.export_import == "export"? "Export":"Import"} in Billion (USD$)`);
 
       // Update gradient for legend
       vis.linearGradient.selectAll('stop')
@@ -212,7 +208,6 @@ class ChoroplethMap {
       var zoom = d3.zoom()
           .scaleExtent([0.7, 6])
           .on('zoom', e => {
-            //console.log(e);
             vis.strokeWidth = 1.7/e.transform.k;
             vis.chart.selectAll('.country')
               .attr('transform', e.transform)

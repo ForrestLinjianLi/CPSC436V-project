@@ -33,15 +33,12 @@ Promise.all([
         'countryMap': _data[5]
     }
 
-    console.log(data["countryMap"]);
     data['countryMap'].forEach(d => {
         id2name[d.location_code] = d.location_name_short_en;
         name2id[d.location_name_short_en] = d.location_code;
     });
 
     timeFilteredData = data["rollupForceData"][selectedTime];
-
-    console.log(timeFilteredData);
 
     data['mergedRawData'].forEach(d => {
         d.import_value = +d.import_value;
@@ -125,7 +122,6 @@ function initDispatchers() {
     dispatcher.on('updateTime', s => {
         selectedTime = s;
         timeFilteredData = data["rollupForceData"][selectedTime];
-        console.log(timeFilteredData);
         updateDisplayedCountries();
 
         overview.data = timeFilteredData;
@@ -161,7 +157,6 @@ function updateDisplayedCountries() {
                     determineMode();
                 });
             }
-            //console.log(countriesSelected);
         }
     )
 }
@@ -222,7 +217,6 @@ async function updateCountryCheckbox() {
 function checkAll() {
     const sel = d3.selectAll('.form-check-input');
     sel.property('checked', false);
-    console.log(sel);
     countriesSelected = [];
     var randomIndexes = [];
     while(randomIndexes.length < 5 || randomIndexes.length == sel._groups[0].length){

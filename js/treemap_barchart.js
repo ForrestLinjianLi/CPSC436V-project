@@ -17,7 +17,6 @@ class TreeMapBarChart {
         countriesSelectedName = countriesSelected.map(d => id2name[d]);
         this.data = this.fullData.filter(d => countriesSelectedName.includes(d.country));
         this.data = this.data.filter(d => d.year >= selectedTime && d.year <= selectedTime);
-        console.log(this.data);
         this.initVis();
     }
 
@@ -175,17 +174,13 @@ class TreeMapBarChart {
             .attr('dy', '0.1em')
             .attr("font-size", "12px");
 
-        console.log(vis.roots);
         // Update the axes
         for (let i = 0; i < vis.roots.length; i++){
             let height = (vis.roots[i].value)/vis.yMax * vis.height
-            console.log("height: " + height)
-            console.log("yScale(country): " + vis.yScale(vis.roots[i].value))
             d3.treemap()
                 .size([vis.xScale.bandwidth(), height+6])
                 .padding(2)
                 (vis.roots[i])
-            console.log(vis.xScale(vis.roots[i].data.country))
             vis.chart
                 .selectAll("rect"+i)
                 .data(vis.roots[i].leaves())

@@ -41,20 +41,7 @@ class OverviewGraph {
 
         // Append group element that will contain our actual chart
         // and position it according to the given margin config
-        vis.chartArea = vis.svg.append('g')
-            .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
-        // Initialize clipping mask that covers the whole chart
-        vis.chartArea.append('defs')
-            .append('clipPath')
-            .attr('id', 'chart-mask')
-            .append('rect')
-            .attr('width', vis.config.width)
-            .attr('y', -vis.config.margin.top)
-            .attr('height', vis.config.height);
-
-        // Append group element that will contain our actual chart
-        // and position it according to the given margin config
-        vis.chart = vis.chartArea.append('g')
+        vis.chart = vis.svg.append('g')
             .attr('transform', `translate(${vis.config.containerWidth/2},${vis.config.containerHeight/2})`);
 
         vis.links = vis.chart.append('g');
@@ -155,9 +142,11 @@ class OverviewGraph {
         vis.lengthScale.domain([1, d3.max(vis.data.node, d=>d.partner_num)]);
         // Add node-link data to simulation
         vis.simulation.nodes(vis.filteredNode);
-        vis.simulation.force('link').links(vis.filteredLink);
-        vis.simulation.force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
-        vis.simulation.force('collide',d3.forceCollide(d => 65)
+        vis.simulation
+            .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
+            .force("charge", d3.forceManyBody().strength(100))
+            .force('link').links(vis.filteredLink)
+        vis.simulation.force('collide',d3.forceCollide()
             .radius(vis.radiusScale(vis.data.node.length)));
         d3.select("#relation-graph-title").text(`The Primary Trading Countries in ${selectedTime}`);
         vis.renderVis();
@@ -168,15 +157,15 @@ class OverviewGraph {
      */
     renderVis() {
         let vis = this;
-        vis.svg.append('p').attr('id', '').text(`The Primary Trading Countries in ${selectedTime}`)
         // Add links
         const links = vis.links.selectAll('.link')
             .data(vis.filteredLink, d => [d.source, d.target])
             .join('line')
             .attr('class', d => `link link-${d.source.id} link-${d.target.id}`)
-            .attr('stroke-width', 5)
+            .attr('stroke-width', 3)
             .attr('opacity', d => vis.opacityScale(d.value))
-            .attr('stroke', '#750000')
+            .attr('stroke', 'black')
+            // .attr('stroke', '#750000')
             .on('mouseover',(event, d) => {
                 d3.selectAll(`#node-${d.source.id}, #node-${d.target.id}`).classed('hover', true);
                 d3.select('#link-tooltip')
@@ -276,7 +265,7 @@ class OverviewGraph {
         // Define begin and end of the color gradient (legend)
         vis.legendStops = [
             { color: 'white', value: 0, offset: 0},
-            { color: "#750000", value: 1, offset: 100},
+            { color: "black", value: 1, offset: 100},
         ];
 
         vis.legend.selectAll('.legend-label')
