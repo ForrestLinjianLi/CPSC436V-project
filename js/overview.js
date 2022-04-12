@@ -71,6 +71,7 @@ class OverviewGraph {
             .on('onchange', (val) => {
                 vis.config.maxNode = val;
                 vis.updateVis();
+                dispatcher.call('updateCountry', event, countriesSelected);
             });
 
         let forceSlider = d3
