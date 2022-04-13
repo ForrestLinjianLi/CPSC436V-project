@@ -267,18 +267,6 @@ class OverviewGraph {
             { color: "black", value: 1, offset: 100},
         ];
 
-        vis.legend.selectAll('.legend-label')
-            .data(vis.legendStops)
-            .join('text')
-            .attr('class', 'legend-label')
-            .attr('text-anchor', 'middle')
-            .attr('dy', '.25em')
-            .attr('y', 20)
-            .attr('x', (d,index) => {
-                return index == 0 ? 0 : 200;
-            })
-            .text(d => Math.round(d.value/(10**9)));
-
         vis.legend.selectAll('.legend-title')
             .data(export_import)
             .join('text')
