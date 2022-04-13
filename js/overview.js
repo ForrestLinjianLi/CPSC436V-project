@@ -36,7 +36,7 @@ class OverviewGraph {
 
         // Define size of SVG drawing area
         vis.svg = d3.select(vis.config.parentElement).append('svg')
-            .attr('width', "100%")
+            .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight);
 
         // Append group element that will contain our actual chart
@@ -76,7 +76,7 @@ class OverviewGraph {
             .attr('font-weight', 'bold')
 
         d3.select('#number-slider')
-            .style('width', "100%")
+            .style('width', vis.config.width /2)
             .append('svg')
             .attr('width',"100%")
             .attr('height', 50)

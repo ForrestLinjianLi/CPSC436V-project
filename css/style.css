@@ -151,9 +151,32 @@ h1 {
 
 .relation-btn-group > .btn {
     height: 40px;
-    width: 110px;
+    width: 5vw;
     margin: 8px 2px 2px 2px;
 }
+
+
+#result {
+    padding: 3px;
+    z-index: 10;
+    position: absolute;
+    background-color: white;
+    width: 10vw;
+}
+
+#result ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+}
+#result ul li {
+    padding: 5px 0;
+}
+#result ul li:hover {
+    background: #eee;
+}
+
 /* Tooltip */
 .tooltip-cus {
     position: absolute;

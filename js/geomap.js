@@ -37,7 +37,7 @@ class ChoroplethMap {
   
       // Define size of SVG drawing area
       vis.svg = d3.select(vis.config.parentElement).append('svg')
-          .attr('width', "100%")
+          .attr('width', vis.config.containerWidth)
           .attr('height', vis.config.containerHeight);
 
 

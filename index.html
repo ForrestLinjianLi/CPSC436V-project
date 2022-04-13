@@ -9,10 +9,10 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700&display=swap" rel="stylesheet">
 </head>
-<body id="out">
-<div id="container" style="width:2000px; height: 1500px; ">
+<body id="out" style="margin-top:4vh">
+<div id="container" style="width:100vw; height: fit-content; ">
     <div class="row">
-        <p style="font-size: 50px">Global Trading Insight </p>
+        <p style="font-size: 3vw; margin-left: 2vw">Global Trading Insight </p>
     </div>
     <div class="row justify-content-md-center" style="height: 70px">
         <div id="year-slider" class="slider"></div>
@@ -32,11 +32,11 @@
                         <div id="number-slider" class="slider">
                             <p class="slider-title">Max Number of Nodes</p>
                         </div>
-                        <div style="margin-left: 10px">
+                        <div style="margin-left: 1vw">
                             <p class="slider-title">Zoom In/Out</p>
                             <div class="relation-btn-group" style="display: inline-flex">
-                                <button class="btn btn-outline-secondary" id="zoomin">Zoom In</button>
-                                <button class="btn btn-outline-secondary" id="zoomout">Zoom Out</button>
+                                <button class="btn btn-outline-secondary" id="zoomin">+</button>
+                                <button class="btn btn-outline-secondary" id="zoomout">-</button>
                                 <button class="btn btn-outline-secondary" id="reset">Reset</button>
                             </div>
                         </div>
@@ -58,11 +58,14 @@
                         <input type="radio" name="options" id="btnradio2" autocomplete="off"> Import
                     </label>
                 </div>
-                <div>
-                    <!-- <h5>Leave 1 to explore, or compare up to 5</h5> -->
-                    <button type="button" class="btn btn-outline-dark" onclick='checkAll()'>Randomly Select 5
+                <div class="filter-btn-group">
+                    <div style="margin-bottom: 10px" >
+                        <input id="search-county-input" type="text" class="form-control" aria-describedby="inputGroup-sizing-sm" placeholder="Search a country..."/>
+                        <div id="result"></div>
+                    </div>
+                    <button type="button" class="btn btn-dark" onclick='checkAll()'>Randomly Select 5
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" style="margin-top: 10px" onclick='uncheckAll()'>Clear Selections
+                    <button type="button" class="btn btn-secondary" style="margin-top: 10px" onclick='uncheckAll()'>Clear Selections
                     </button>
                 </div>
                 <div>

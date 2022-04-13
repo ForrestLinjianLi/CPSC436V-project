@@ -15,6 +15,7 @@ let data, timeFilteredData;
 // Dispatcher
 const dispatcher = d3.dispatch('updateCountry', 'updateTime', "updateRelationBarChart", 'updateForce');
 
+const vh = window.innerHeight / 100, vw = window.innerWidth / 100;
 // Load data
 Promise.all([
     d3.json('data/node_link.json'),
@@ -65,14 +66,14 @@ function initViews() {
     // Relation graph
     overview = new OverviewGraph({
         parentElement: '#overview',
-        containerWidth: 760,
+        containerWidth: 35 * vw,
         containerHeight: 570,
     }, timeFilteredData, barChart, dispatcher);
 
     // Geomap
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
-        containerWidth: 1000,
+        containerWidth: 35 * vw,
         containerHeight: 638,
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
@@ -107,8 +108,55 @@ function initViews() {
         .append('g')
         .attr('transform', `translate(30, 15)`)
         .call(yearSlider);
+
+    document.getElementById("search-county-input")
+        .addEventListener('keyup', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                selectCountry(e);
+            } else {
+                showResults(e.target.value);
+            }
+    });
+    document.getElementById("search-county-input")
+        .addEventListener('change', (e) => {
+        selectCountry(e);
+    });
+
 }
 
+function selectCountry(e) {
+    let cname = name2id[e.target.value]
+    if (cname) {
+        if (!countriesSelected.includes(cname)) {
+            countriesSelected.push(cname);
+            dispatcher.call("updateCountry", e, countriesSelected);
+        }
+        document.getElementById("result").innerHTML= "";
+        document.getElementById("search-county-input").value = "";
+    }
+}
+function autocompleteMatch(input) {
+    if (input == '') {
+        return [];
+    }
+    var reg = new RegExp(input)
+    return Array.from(countries).map(d => id2name[d]).filter(function(term) {
+        if (term.match(reg)) {
+            return term;
+        }
+    });
+}
+
+function showResults(val) {
+    res = document.getElementById("result");
+    res.innerHTML = '';
+    let list = '';
+    let terms = autocompleteMatch(val);
+    for (i=0; i<terms.length; i++) {
+        list += `<li> ${terms[i]}</li>`;
+    }
+    res.innerHTML = '<ul>' + list + '</ul>';
+}
 
 function initDispatchers() {
     dispatcher.on('updateCountry', countries_id => {
@@ -123,7 +171,6 @@ function initDispatchers() {
         selectedTime = s;
         timeFilteredData = data["rollupForceData"][selectedTime];
         updateDisplayedCountries();
-
         overview.data = timeFilteredData;
         overview.updateVis();
         relationNodeFocus();
@@ -249,7 +296,7 @@ function determineMode(){
         d3.select("#scatter").html("");
         treemap = new TreeMap({
             parentElement: '#scatter',
-            containerWidth: 1600
+            containerWidth: 78 * vw
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
@@ -257,7 +304,7 @@ function determineMode(){
         d3.select("#scatter").html("");
         treeMapBarChart = new TreeMapBarChart({
             parentElement: '#scatter',
-            containerWidth: 1600
+            containerWidth: 78 * vw
         }, data["mergedRawData"]);
     }
 }
