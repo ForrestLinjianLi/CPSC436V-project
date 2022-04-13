@@ -15,7 +15,7 @@ class ChoroplethMap {
         legendBottom: 35,
         legendLeft: 10,
         legendRectHeight: 12, 
-        legendRectWidth: 150
+        legendRectWidth: 200
       }
       this.data = _world_data;
       this.value_data = _value_data;
@@ -96,7 +96,7 @@ class ChoroplethMap {
         .range([vis.c1, vis.c2])
         .interpolate(d3.interpolateHcl);
 
-        d3.select("#geomap-title").text(`The Net ${vis.export_import == "export"? "Export":"Import"} Value of Countries in ${selectedTime}`);
+        d3.select("#geomap-title").text(`The Total ${vis.export_import == "export"? "Export":"Import"} Value of Countries in ${selectedTime}`);
 
         const extent = d3.extent(vis.data.features, d => d.properties.value);
 
@@ -194,7 +194,7 @@ class ChoroplethMap {
           .attr('class', 'legend-title')
           .attr('dy', '.35em')
           .attr('y', -10)
-          .text(`${vis.export_import == "export"? "Export":"Import"} in Billion (USD$)`);
+          .text(`Total ${vis.export_import == "export"? "Export":"Import"} Value (Billion USD$)`);
 
       // Update gradient for legend
       vis.linearGradient.selectAll('stop')

@@ -142,11 +142,11 @@ class OverviewGraph {
         // Add node-link data to simulation
         vis.simulation.nodes(vis.filteredNode);
         vis.simulation
-            .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2))
-            .force("charge", d3.forceManyBody().strength(100))
+            .force('center', d3.forceCenter(vis.config.containerWidth / 2, vis.config.containerHeight / 2))
+            .force("charge", d3.forceManyBody().strength(500))
             .force('link').links(vis.filteredLink)
         vis.simulation.force('collide',d3.forceCollide()
-            .radius(vis.radiusScale(vis.data.node.length)));
+            .radius(vis.radiusScale(vis.data.node.length)).iterations(2));
         d3.select("#relation-graph-title").text(`The Primary Trading Countries in ${selectedTime}`);
         vis.renderVis();
     }
@@ -174,7 +174,7 @@ class OverviewGraph {
                     .html(`
                       <div class="tooltip-title">${d.target.id} - ${d.source.id}</div>
                       <ul>
-                        <li>Overall Trading Amount: ${(d.value / 10000000000).toFixed(2)} billion</li>
+                        <li>Overall Trading Amount: ${(d.value / 1000000000).toFixed(2)} billion</li>
                       </ul>
                     `);
             })
@@ -285,7 +285,7 @@ class OverviewGraph {
             .attr('class', 'legend-title')
             .attr('dy', '.25em')
             .attr('y', -10)
-            .text(`Net Trading Value (USD$)`);
+            .text(`Net Trading Value (Billion USD$)`);
 
         // Initialize gradient that we will later use for the legend
         vis.linearGradient = vis.svg.append('defs').append('linearGradient')
