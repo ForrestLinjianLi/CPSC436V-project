@@ -65,6 +65,11 @@ class ChoroplethMap {
           .attr('width', vis.config.legendRectWidth)
           .attr('height', vis.config.legendRectHeight);
 
+      vis.legend.append('text')
+          .attr('id', 'geomap-legend-title')
+          .attr('dy', '.35em')
+          .attr('y', -10);
+
       vis.strokeWidth = 2.2;
 
     vis.svg.append('text')
@@ -188,12 +193,7 @@ class ChoroplethMap {
           })
           .text(d => Math.round(d.value/(10**9)));
 
-      vis.legend.selectAll('.legend-title')
-          .data(vis.export_import)
-        .join('text')
-          .attr('class', 'legend-title')
-          .attr('dy', '.35em')
-          .attr('y', -10)
+      vis.legend.select('#geomap-legend-title')
           .text(`Total ${vis.export_import == "export"? "Export":"Import"} Value (Billion USD$)`);
 
       // Update gradient for legend

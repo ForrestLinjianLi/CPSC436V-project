@@ -148,8 +148,12 @@ h1 {
     display: inline-flex;
     width: 100%;
 }
-  
 
+.relation-btn-group > .btn {
+    height: 40px;
+    width: 110px;
+    margin: 8px 2px 2px 2px;
+}
 /* Tooltip */
 .tooltip-cus {
     position: absolute;

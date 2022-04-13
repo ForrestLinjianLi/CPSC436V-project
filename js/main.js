@@ -65,7 +65,7 @@ function initViews() {
     // Relation graph
     overview = new OverviewGraph({
         parentElement: '#overview',
-        containerWidth: 510,
+        containerWidth: 760,
         containerHeight: 570,
     }, timeFilteredData, barChart, dispatcher);
 
@@ -249,7 +249,7 @@ function determineMode(){
         d3.select("#scatter").html("");
         treemap = new TreeMap({
             parentElement: '#scatter',
-            containerWidth: 1400
+            containerWidth: 1600
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
@@ -257,7 +257,7 @@ function determineMode(){
         d3.select("#scatter").html("");
         treeMapBarChart = new TreeMapBarChart({
             parentElement: '#scatter',
-            containerWidth: 1400
+            containerWidth: 1600
         }, data["mergedRawData"]);
     }
 }

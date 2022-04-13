@@ -42,16 +42,16 @@ class OverviewGraph {
         // Append group element that will contain our actual chart
         // and position it according to the given margin config
         vis.chart = vis.svg.append('g')
-            .attr('transform', `translate(${vis.config.containerWidth / 2},${vis.config.containerHeight / 2})`);
+            .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
 
         vis.links = vis.chart.append('g');
         vis.nodes = vis.chart.append('g');
 
-        // Initialize force simulation
-        vis.simulation = d3.forceSimulation()
-            .force('link', d3.forceLink().id(d => d.id))
-            .force('charge', d3.forceManyBody().strength(50))
-            .force('center', d3.forceCenter(vis.config.width / 2, vis.config.height / 2));
+        // // Initialize force simulation
+        // vis.simulation = d3.forceSimulation()
+        //     .force('link', d3.forceLink().id(d => d.id))
+        //     .force('charge', d3.forceManyBody().strength(50))
+        //     .force('center', d3.forceCenter(vis.config.containerWidth / 2, vis.config.containerWidth / 2));
 
         vis.patterns = vis.chart.append('defs');
 
@@ -61,25 +61,12 @@ class OverviewGraph {
             .width(vis.config.containerWidth / 2)
             .step(2)
             .default(10)
-            // .displayValue(false)
             .on('onchange', (val) => {
                 vis.config.maxNode = val;
                 vis.updateVis();
                 dispatcher.call('updateCountry', event, countriesSelected);
             });
 
-        vis.forceSlider = d3
-            .sliderBottom()
-            .domain([0.5, 1.5])
-            .width(vis.config.containerWidth / 2)
-            .step(0.1)
-            .default(1)
-            .on('onchange', (val) => {
-                const k = d3.zoomTransform(vis.chart.node()).k;
-                if (k === val)
-                    return;
-                zoom.scaleTo(vis.chart, val);
-            });
         vis.svg.append('text')
             .attr('id', 'relation-graph-title')
             .attr("x", "50%")
@@ -89,21 +76,23 @@ class OverviewGraph {
             .attr('font-weight', 'bold')
 
         d3.select('#number-slider')
+            .style('width', "100%")
             .append('svg')
-            .attr('width', "100%")
+            .attr('width',"100%")
             .attr('height', 50)
             .append('g')
-            .attr('transform', `translate(30, 15)`)
+            .attr('transform', `translate(15, 15)`)
             .call(vis.numberSlider);
 
-        d3.select('#force-slider')
-            .append('svg')
-            .attr('width', "100%")
-            .attr('height', 50)
-            .append('g')
-            .attr('transform', `translate(30,15)`)
-            .call(vis.forceSlider);
-
+        d3.select("#zoomout").on("click", () => {
+                zoom.scaleBy(vis.chart, 0.8);
+            });
+        d3.select("#zoomin").on("click", () => {
+            zoom.scaleBy(vis.chart, 1.2);
+        });
+        d3.select("#reset").on("click", () => {
+            zoom.scaleTo(vis.chart, 1);
+        });
         d3.selectAll('.slider text').attr('dy', '0.35em');
 
         // Add legend labels
@@ -116,14 +105,37 @@ class OverviewGraph {
             .attr('width', 200)
             .attr('height', 10);
 
-        let transform;
+        vis.legend.append('text')
+            .attr('class', 'legend-title')
+            .attr('dy', '.25em')
+            .attr('y', -10)
+            .text(`Net Trading Value (Billion USD$)`);
+
+        // Define begin and end of the color gradient (legend)
+        vis.legendStops = [
+            {color: 'white', value: 0, offset: 0},
+            {color: "black", value: 1, offset: 100},
+        ];
+
+
+
+        // Initialize gradient that we will later use for the legend
+        vis.linearGradient = vis.svg.append('defs').append('linearGradient')
+            .attr("id", "relation-legend-gradient");
+
+        // Update gradient for legend
+        vis.linearGradient.selectAll('stop')
+            .data(vis.legendStops)
+            .join('stop')
+            .attr('offset', d => d.offset)
+            .attr('stop-color', d => d.color);
+
+        vis.legendRect.attr('fill', 'url(#relation-legend-gradient)');
+
         const zoom = d3.zoom()
-            .scaleExtent([0.5, 1.5])
+            .scaleExtent([0.4, 3])
             .on("zoom", e => {
-                vis.chart.attr("transform", (transform = e.transform));
-                if (vis.forceSlider.value() !== e.transform.k) {
-                    vis.forceSlider = vis.forceSlider.value(e.transform.k);
-                }
+                vis.chart.attr("transform", e.transform);
             });
         vis.svg.call(zoom)
             .call(zoom.transform, d3.zoomIdentity);
@@ -142,10 +154,12 @@ class OverviewGraph {
         vis.opacityScale.domain([d3.min(vis.data.link, d => d.value), d3.max(vis.data.link, d => d.value)])
         vis.lengthScale.domain([1, d3.max(vis.data.node, d => d.partner_num)]);
         // Add node-link data to simulation
+        vis.simulation = d3.forceSimulation();
         vis.simulation.nodes(vis.filteredNode);
         vis.simulation
+            .force('link', d3.forceLink().id(d => d.id))
             .force('center', d3.forceCenter(vis.config.containerWidth / 2, vis.config.containerHeight / 2))
-            .force("charge", d3.forceManyBody().strength(500))
+            .force("charge", d3.forceManyBody().strength(100))
             .force('link').links(vis.filteredLink)
         vis.simulation.force('collide', d3.forceCollide()
             .radius(vis.radiusScale(vis.data.node.length)).iterations(2));
@@ -262,32 +276,7 @@ class OverviewGraph {
                 .attr('cy', d => d.y);
         });
 
-        // Define begin and end of the color gradient (legend)
-        vis.legendStops = [
-            {color: 'white', value: 0, offset: 0},
-            {color: "black", value: 1, offset: 100},
-        ];
 
-        vis.legend.selectAll('.legend-title')
-            .data(export_import)
-            .join('text')
-            .attr('class', 'legend-title')
-            .attr('dy', '.25em')
-            .attr('y', -10)
-            .text(`Net Trading Value (Billion USD$)`);
-
-        // Initialize gradient that we will later use for the legend
-        vis.linearGradient = vis.svg.append('defs').append('linearGradient')
-            .attr("id", "relation-legend-gradient");
-
-        // Update gradient for legend
-        vis.linearGradient.selectAll('stop')
-            .data(vis.legendStops)
-            .join('stop')
-            .attr('offset', d => d.offset)
-            .attr('stop-color', d => d.color);
-
-        vis.legendRect.attr('fill', 'url(#relation-legend-gradient)');
         vis.simulation.restart();
     }
 }
