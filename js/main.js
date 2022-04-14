@@ -82,8 +82,7 @@ function initViews() {
 
     // add button listeners
     document.getElementsByClassName("btn-group ")[0].addEventListener('click', (e) => {
-        export_import = e.target.innerText.toLowerCase();
-        overview.updateVis();
+        export_import = e.target.innerText.toLowerCase(); 
         relationNodeFocus();
         updateGeomap();
         determineMode();
@@ -172,7 +171,6 @@ function initDispatchers() {
         timeFilteredData = data["rollupForceData"][selectedTime];
         updateDisplayedCountries();
         overview.data = timeFilteredData;
-        overview.updateVis();
         relationNodeFocus();
         updateGeomap();
         determineMode();
@@ -217,6 +215,7 @@ function updateGeomap() {
 }
 
 function relationNodeFocus() {
+    overview.updateVis();
     if (countriesSelected.length > 0) {
         d3.selectAll('.node').classed('highlight', false).style('opacity', 0.35);
         d3.selectAll('.link').classed('highlight', false);
@@ -227,8 +226,6 @@ function relationNodeFocus() {
     } else {
         d3.selectAll('.node').classed('highlight', false).style('opacity', 1);
     }
-
-
 }
 
 async function updateCountryCheckbox() {

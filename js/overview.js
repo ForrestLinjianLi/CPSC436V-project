@@ -11,7 +11,7 @@ class OverviewGraph {
             containerHeight: _config.containerHeight || 500,
             margin: {top: 40, right: 5, bottom: 20, left: 5},
             tooltipPadding: _config.tooltipPadding || 15,
-            maxNode: 15,
+            maxNode: 10,
         }
         this.data = _data;
         this.initVis();
@@ -57,10 +57,10 @@ class OverviewGraph {
 
         vis.numberSlider = d3
             .sliderBottom()
-            .domain([0, 30])
+            .domain([1, 50])
             .width(vis.config.containerWidth / 2)
             .step(2)
-            .default(10)
+            .default(vis.config.maxNode)
             .on('onchange', (val) => {
                 vis.config.maxNode = val;
                 vis.updateVis();
@@ -147,7 +147,7 @@ class OverviewGraph {
      */
     updateVis() {
         let vis = this;
-        let sorted = new Set(vis.data.node.slice().sort((a, b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode + 1 - countriesSelected.length)));
+        let sorted = new Set(vis.data.node.slice().sort((a, b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode - countriesSelected.length)));
         countriesSelected.forEach(c => sorted.add(c));
         vis.filteredNode = vis.data.node.filter(d => sorted.has(d.id));
         vis.filteredLink = vis.data.link.filter(d => (sorted.has(d.target) && sorted.has(d.source) || sorted.has(d.target.id) && sorted.has(d.source.id)));
