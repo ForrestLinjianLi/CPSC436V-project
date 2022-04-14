@@ -89,9 +89,9 @@ class TreeMapBarChart {
         vis.svg.append('text')
             .attr('id', 'treeMapBarChartTitle')
             .attr("x", "50%")
-            .attr("y", 1.4*vh)
+            .attr("y", 20)
             .attr("text-anchor", "middle")
-            .attr('font-size', 1.1*vw)
+            .attr('font-size', 2*vh)
             .attr('font-weight', 'bold')
             .text((export_import == "export") ?
                 "Countries Export Value Comparison by Product in " + selectedTime

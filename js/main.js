@@ -185,8 +185,10 @@ function initDispatchers() {
     dispatcher.on('updateTime', s => {
         selectedTime = s;
         timeFilteredData = data["rollupForceData"][selectedTime];
-        updateDisplayedCountries();
+        let curCuntries = new Set(timeFilteredData.node.map(d => d.id));
         overview.data = timeFilteredData;
+        countriesSelected = countriesSelected.filter(d => curCuntries.has(d))
+        updateDisplayedCountries();
         relationNodeFocus();
         updateGeomap();
         determineMode();
@@ -234,17 +236,17 @@ function updateGeomap() {
 }
 
 function relationNodeFocus() {
+    overview.updateVis();
     if (countriesSelected.length > 0) {
         d3.selectAll('.node').classed('highlight', false).style('opacity', 0.35);
         d3.selectAll('.link').classed('highlight', false);
         countriesSelected.forEach(c => {
-            let node = d3.select(`#node-${c}`).classed('highlight', true).style('opacity', 1);
+            d3.select(`#node-${c}`).classed('highlight', true).style('opacity', 1);
             d3.selectAll(`.link-${c}`).classed('highlight', true);
         });
     } else {
         d3.selectAll('.node').classed('highlight', false).style('opacity', 1);
     }
-    overview.updateVis();
 }
 
 async function updateCountryCheckbox() {

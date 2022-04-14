@@ -77,9 +77,9 @@ text {
     margin-top: 10px;
 }
 
-#filter-container>* {
+#filter-container > * {
     padding: 10px;
-    font-size: 1.5vh;
+    font-size: 1.3vh;
 }
 
 #country-filter {
