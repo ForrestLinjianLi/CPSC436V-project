@@ -147,9 +147,11 @@ class OverviewGraph {
      */
     updateVis() {
         let vis = this;
-        let sorted = new Set(vis.data.node.slice().sort((a, b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode - selectCountry.length)));
+        const numberOfNotSelectedCountries = Math.min(vis.data.node.length, vis.config.maxNode - countriesSelected.length) > 0?  Math.min(vis.data.node.length, vis.config.maxNode - countriesSelected.length) : 0;
+        let sorted = new Set(vis.data.node.filter(d => !countriesSelected.includes(d.id)).slice()
+            .sort((a, b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, numberOfNotSelectedCountries));
         for (let i = 0; i < countriesSelected.length; i++) {
-            if(sorted.size == vis.config.maxNode ) break;
+            if(sorted.size >= vis.config.maxNode ) break;
             sorted.add(countriesSelected[i]);
         }
         vis.filteredNode = vis.data.node.filter(d => sorted.has(d.id));

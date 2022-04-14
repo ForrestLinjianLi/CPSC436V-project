@@ -215,7 +215,6 @@ function updateGeomap() {
 }
 
 function relationNodeFocus() {
-    overview.updateVis();
     if (countriesSelected.length > 0) {
         d3.selectAll('.node').classed('highlight', false).style('opacity', 0.35);
         d3.selectAll('.link').classed('highlight', false);
@@ -226,6 +225,7 @@ function relationNodeFocus() {
     } else {
         d3.selectAll('.node').classed('highlight', false).style('opacity', 1);
     }
+    overview.updateVis();
 }
 
 async function updateCountryCheckbox() {
