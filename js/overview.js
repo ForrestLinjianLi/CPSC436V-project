@@ -147,9 +147,11 @@ class OverviewGraph {
      */
     updateVis() {
         let vis = this;
-        let sorted = new Set(vis.data.node.slice().sort((a, b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode - 1)));
-        console.log(sorted);
-        countriesSelected.forEach(c => sorted.add(c));
+        let sorted = new Set(vis.data.node.slice().sort((a, b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode - selectCountry.length)));
+        for (let i = 0; i < countriesSelected.length; i++) {
+            if(sorted.size == vis.config.maxNode ) break;
+            sorted.add(countriesSelected[i]);
+        }
         vis.filteredNode = vis.data.node.filter(d => sorted.has(d.id));
         vis.filteredLink = vis.data.link.filter(d => (sorted.has(d.target) && sorted.has(d.source) || sorted.has(d.target.id) && sorted.has(d.source.id)));
         vis.opacityScale.domain([d3.min(vis.data.link, d => d.value), d3.max(vis.data.link, d => d.value)])
