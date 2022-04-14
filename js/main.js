@@ -81,7 +81,7 @@ function initViews() {
     overview = new OverviewGraph({
         parentElement: '#overview',
         containerWidth: 28 * vw,
-        containerHeight: 39 * vh,
+        containerHeight: 38 * vh,
     }, timeFilteredData, barChart, dispatcher);
 
     // Geomap
