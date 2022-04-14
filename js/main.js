@@ -43,17 +43,17 @@ Promise.all([
         data['countryMap'].forEach(c => {
             if (c.location_name_short_en.includes(d.country) || d.country.includes(c.location_name_short_en)) {
                 name2emoji[c.location_name_short_en] = d.emoji;
-                found = true;
             }
         })
     });
-    console.log(name2emoji);
 
     data['countryMap'].forEach(d => {
         id2name[d.location_code] = d.location_name_short_en;
         name2id[d.location_name_short_en] = d.location_code;
-        name2emoji[d.location_name_short_en] = name2emoji[d.location_name_short_en] === 'undefined'? '🏳️‍🌈' : name2emoji[d.location_name_short_en];
+        name2emoji[d.location_name_short_en] =  !(d.location_name_short_en in name2emoji)? '🏳️‍🌈' : name2emoji[d.location_name_short_en];
     });
+
+    console.log('🏳️‍🌈'.length);
 
     timeFilteredData = data["rollupForceData"][selectedTime];
 
@@ -207,7 +207,9 @@ function updateDisplayedCountries() {
             for (const input of inputs) {
                 input.addEventListener('click', (event) => {
                     const elem = event.currentTarget;
-                    const label = elem.parentNode.outerText;
+                    const templabel =  elem.parentNode.outerText;
+                    let label;
+                    timeFilteredData['node'].forEach(d => {if (templabel.includes(id2name[d.id])){label = id2name[d.id]}});
                     if (elem.checked) {
                         countriesSelected.push(name2id[label]);
                     } else {
@@ -262,7 +264,7 @@ async function updateCountryCheckbox() {
             countryHTML += `
         <div class="form-check">
             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`> 
-            <label class="form-check-label" for="flexCheckDefault">`  + val + `<span> ` + name2emoji[val] + `</span> </label>
+            <label class="form-check-label" for="flexCheckDefault">`  + val  + name2emoji[val] + `</label>
         </div>
     `
         });
@@ -285,7 +287,10 @@ function checkAll() {
     }
     randomIndexes.map(d => {
         sel._groups[0][d].checked = true;
-        countriesSelected.push(name2id[sel._groups[0][d].parentElement.outerText]);
+        const tempLabel = sel._groups[0][d].parentElement.outerText;
+        let id;
+        timeFilteredData['node'].forEach(d => {if (tempLabel.includes(id2name[d.id])){id = d.id}});
+        countriesSelected.push(id);
     });
     relationNodeFocus();
     updateGeomap();
@@ -305,7 +310,6 @@ function uncheckAll() {
 function determineMode(){
     if(countriesSelected.length <= 1) {
         // exploration mode
-        d3.select("#out").attr("background", "#a7ebbb"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");
         treemap = new TreeMap({
             parentElement: '#scatter',
@@ -314,7 +318,6 @@ function determineMode(){
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
-        d3.select("#out").attr("background", "#f0f3f5"); // TODO: Do something to change background color and mode color
         d3.select("#scatter").html("");
         treeMapBarChart = new TreeMapBarChart({
             parentElement: '#scatter',
