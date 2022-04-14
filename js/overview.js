@@ -57,7 +57,7 @@ class OverviewGraph {
 
         vis.numberSlider = d3
             .sliderBottom()
-            .domain([1, 50])
+            .domain([1, 30])
             .width(vis.config.containerWidth / 2)
             .step(2)
             .default(vis.config.maxNode)
@@ -147,7 +147,8 @@ class OverviewGraph {
      */
     updateVis() {
         let vis = this;
-        let sorted = new Set(vis.data.node.slice().sort((a, b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode - countriesSelected.length)));
+        let sorted = new Set(vis.data.node.slice().sort((a, b) => d3.descending(a.partner_num, b.partner_num)).map(d => d.id).slice(0, Math.min(vis.data.node.length, vis.config.maxNode - 1)));
+        console.log(sorted);
         countriesSelected.forEach(c => sorted.add(c));
         vis.filteredNode = vis.data.node.filter(d => sorted.has(d.id));
         vis.filteredLink = vis.data.link.filter(d => (sorted.has(d.target) && sorted.has(d.source) || sorted.has(d.target.id) && sorted.has(d.source.id)));
