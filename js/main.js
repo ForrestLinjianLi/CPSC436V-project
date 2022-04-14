@@ -67,14 +67,14 @@ function initViews() {
     overview = new OverviewGraph({
         parentElement: '#overview',
         containerWidth: 35 * vw,
-        containerHeight: 570,
+        containerHeight: 28 * vh,
     }, timeFilteredData, barChart, dispatcher);
 
     // Geomap
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
         containerWidth: 35 * vw,
-        containerHeight: 638,
+        containerHeight: 30.5 * vh,
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
     // init treeMapBarChart/tree map based on mode
@@ -296,7 +296,8 @@ function determineMode(){
         d3.select("#scatter").html("");
         treemap = new TreeMap({
             parentElement: '#scatter',
-            containerWidth: 78 * vw
+            containerWidth: 78 * vw,
+            containerHeight: 35 * vh,
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
@@ -304,7 +305,8 @@ function determineMode(){
         d3.select("#scatter").html("");
         treeMapBarChart = new TreeMapBarChart({
             parentElement: '#scatter',
-            containerWidth: 78 * vw
+            containerWidth: 78 * vw,
+            containerHeight: 35 * vh,
         }, data["mergedRawData"]);
     }
 }

@@ -44,9 +44,9 @@ class TreeMap {
         vis.svg.append('text')
             .attr('id', 'treeMapTitle')
             .attr("x", "50%")
-            .attr("y", 20)
+            .attr("y", 1.4*vh)
             .attr("text-anchor", "middle")
-            .attr('font-size', '21px')
+            .attr('font-size', vw)
             .attr('font-weight', 'bold')
             .text((export_import == "export") ?
                 country + " Export Value Distribution by Product in " + selectedTime
@@ -138,7 +138,7 @@ class TreeMap {
                         (export_import == "export") ?
                             `
                     <div class="tooltip-title">${country}</div>
-                    <ul>
+                      <ul>
                       <li>Year: ${year}</li>
                       <li>${d.data.product} ${export_import} value: ${(d.data.export_value/1000000000).toFixed(2)} Billion USD</li>
                     <ul> 
@@ -160,16 +160,16 @@ class TreeMap {
             .data(root.leaves())
             .enter()
             .append("text")
-            .attr("x", function (d) {return d.x0 + 10})    // +10 to adjust position (more right)
-            .attr("y", function (d) {return d.y0 + 20})    // +20 to adjust position (lower)
+            .attr("x", function (d) {return d.x0 + 0.5*vw})    // +10 to adjust position (more right)
+            .attr("y", function (d) {return d.y0 + 1.5*vh})    // +20 to adjust position (lower)
             .text(function (d) {
-                if(d.x1 - d.x0 > 60 && d.y1 - d.y0 > 30) {
+                if(d.x1 - d.x0 > 6*vw && d.y1 - d.y0 > vh) {
                     return d.data.product;
                 } else {
                     return null;
                 }
             })
-            .attr("font-size", "12px")
+            .attr("font-size", 1.5*vh)
             .attr("fill", "white")
     }
 
