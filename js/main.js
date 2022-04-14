@@ -1,6 +1,6 @@
 // Filters
 let countries = new Set();
-let countriesSelected = [];
+let countriesSelected = ['CAN'];
 let export_import = 'export';
 let selectedTime = 1995; 
 let mode = 'overview'; // overview/ exploration;
@@ -208,12 +208,13 @@ function updateDisplayedCountries() {
                 input.addEventListener('click', (event) => {
                     const elem = event.currentTarget;
                     const templabel =  elem.parentNode.outerText;
-                    let label;
-                    timeFilteredData['node'].forEach(d => {if (templabel.includes(id2name[d.id])){label = id2name[d.id]}});
+                    let id;
+                    timeFilteredData['node'].forEach(d => {if (templabel.includes(id2name[d.id])){id= d.id}});
+                    console.log(id);
                     if (elem.checked) {
-                        countriesSelected.push(name2id[label]);
+                        countriesSelected.push(id);
                     } else {
-                        countriesSelected = countriesSelected.filter(d => d != name2id[label]);
+                        countriesSelected = countriesSelected.filter(d => d != id);
                     }
                     relationNodeFocus();
                     updateGeomap();
