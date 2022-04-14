@@ -73,17 +73,33 @@ class TreeMap {
         }
 
         if (countriesSelected.length == 0) {
-            console.log(timeFilteredData.node);
-            let text = `Please Select A Country to Show The Tree Map`;
-            timeFilteredData.node.forEach(d => {
-                text += name2emoji[id2name[d.id]];
-            })
-            d3.select("#treeMapTitle").text(text);
-        }
+            let dy = 60;
+            d3.select("#treeMapTitle")
+                .attr("y", dy)    
+                .text("Please Select A Country to Show The Tree Map");
 
-        // Specificy accessor functions
-        vis.productColorScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other"]);
-        vis.renderVis();
+            let text =  "";
+            for (let i = 1; i < timeFilteredData.node.length + 1; i++) {
+                text += name2emoji[id2name[timeFilteredData.node[i - 1].id]];
+                if (i % 10 == 0) {
+                    dy += 60;
+                    console.log(dy);
+                    vis.svg
+                        .append("text")
+                        .attr("x", "50%")
+                        .attr("y", dy)
+                        .attr("text-anchor", "middle")
+                        .attr('font-size', 2*vh)
+                        .attr('font-weight', 'bold')
+                        .text(text)
+                    text = "";
+                }
+            } 
+        } else {
+            // Specificy accessor functions
+            vis.productColorScale.domain(["Textiles", "Agriculture", "Stone", "Minerals", "Metals", "Chemicals", "Vehicles", "Machinery", "Electronics", "Other"]);
+            vis.renderVis();
+        }
     }
 
     renderVis() {

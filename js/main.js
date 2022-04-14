@@ -53,8 +53,6 @@ Promise.all([
         name2emoji[d.location_name_short_en] =  !(d.location_name_short_en in name2emoji)? '🏳️‍🌈' : name2emoji[d.location_name_short_en];
     });
 
-    console.log('🏳️‍🌈'.length);
-
     timeFilteredData = data["rollupForceData"][selectedTime];
 
     data['mergedRawData'].forEach(d => {
@@ -267,7 +265,7 @@ async function updateCountryCheckbox() {
             countryHTML += `
         <div class="form-check">
             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`> 
-            <label class="form-check-label" for="flexCheckDefault">`  + val  + name2emoji[val] + `</label>
+            <label class="form-check-label" for="flexCheckDefault">`  + val  + ` ` + name2emoji[val] + `</label>
         </div>
     `
         });
