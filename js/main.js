@@ -315,7 +315,7 @@ function determineMode(){
         treemap = new TreeMap({
             parentElement: '#scatter',
             containerWidth: 64 * vw,
-            containerHeight: 35 * vh,
+            containerHeight: 36 * vh,
         }, data["mergedRawData"]);
     } else if(countriesSelected.length > 1) {
         // overview mode
@@ -323,7 +323,7 @@ function determineMode(){
         treeMapBarChart = new TreeMapBarChart({
             parentElement: '#scatter',
             containerWidth: 64 * vw,
-            containerHeight: 35 * vh,
+            containerHeight: 36 * vh,
         }, data["mergedRawData"]);
     }
 }

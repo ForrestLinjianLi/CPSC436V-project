@@ -77,7 +77,7 @@ class ChoroplethMap {
         .attr("x", "50%")
         .attr("y", 20)
         .attr("text-anchor", "middle")
-        .attr('font-size', '21px')
+        .attr('font-size', 2*vh)
         .attr('font-weight', 'bold')
 
       vis.updateVis();

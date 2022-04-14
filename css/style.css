@@ -44,7 +44,7 @@ svg > g > g.slider > g > text {
 }
 
 .tick text {
-    font-size: 12px;
+    font-size: 1vh;
     font-weight: bold;
 }
 
@@ -79,6 +79,7 @@ text {
 
 #filter-container>* {
     padding: 10px;
+    font-size: 1.5vh;
 }
 
 #country-filter {

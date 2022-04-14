@@ -44,9 +44,9 @@ class TreeMap {
         vis.svg.append('text')
             .attr('id', 'treeMapTitle')
             .attr("x", "50%")
-            .attr("y", 1.4*vh)
+            .attr("y", 20)
             .attr("text-anchor", "middle")
-            .attr('font-size', vw)
+            .attr('font-size', 2*vh)
             .attr('font-weight', 'bold')
             .text((export_import == "export") ?
                 country + " Export Value Distribution by Product in " + selectedTime
