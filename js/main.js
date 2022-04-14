@@ -1,6 +1,6 @@
 // Filters
 let countries = new Set();
-let countriesSelected = ['CAN'];
+let countriesSelected = [];
 let export_import = 'export';
 let selectedTime = 1995; 
 let mode = 'overview'; // overview/ exploration;

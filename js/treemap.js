@@ -73,7 +73,12 @@ class TreeMap {
         }
 
         if (countriesSelected.length == 0) {
-            d3.select("#treeMapTitle").text("Please Select A Country to Show The Tree Map");
+            console.log(timeFilteredData.node);
+            let text = `Please Select A Country to Show The Tree Map`;
+            timeFilteredData.node.forEach(d => {
+                text += name2emoji[id2name[d.id]];
+            })
+            d3.select("#treeMapTitle").text(text);
         }
 
         // Specificy accessor functions
