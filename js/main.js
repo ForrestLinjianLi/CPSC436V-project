@@ -124,6 +124,7 @@ function initViews() {
         return {label: id2name[d], value: d}
     });
 
+    var  input = document.getElementById("search-county-input");
     autocomplete({
         input: document.getElementById("search-county-input"),
         minLength:1,
