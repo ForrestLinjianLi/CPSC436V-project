@@ -76,19 +76,19 @@ class OverviewGraph {
             .attr('font-weight', 'bold')
 
         d3.select('#number-slider')
-            .style('width', vis.config.width /2)
+            .style('width', 'fit-content')
             .append('svg')
-            .attr('width',"100%")
+            .attr('width',vis.config.containerWidth / 2 + 30)
             .attr('height', 50)
             .append('g')
             .attr('transform', `translate(15, 15)`)
             .call(vis.numberSlider);
 
         d3.select("#zoomout").on("click", () => {
-                zoom.scaleBy(vis.chart, 0.8);
+                zoom.scaleBy(vis.chart, 0.9);
             });
         d3.select("#zoomin").on("click", () => {
-            zoom.scaleBy(vis.chart, 1.2);
+            zoom.scaleBy(vis.chart, 1.1);
         });
         d3.select("#reset").on("click", () => {
             zoom.scaleTo(vis.chart, 1);
