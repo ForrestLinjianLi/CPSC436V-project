@@ -1,19 +1,17 @@
 # Global Trading Insight
 
-We dedicate this visualization project to explore the global commercial trading over the past several decades. In this visualization, there are two modes, Overview Mode and Exploratory Mode, that contain different
-views respectively. The Overview mode aims to enable users to analyze what role does each primary trading country act in
-the world. The Exploratory mode presents the details of a specific country’s trading records from multiple perspectives.
+We dedicate this visualization project to explore the global commercial trading over the past several decades.
 
-## Overview Mode
-<img src="image/overview.png" width="1000">
-In this mode, users can have an overview of the major international trading activities. There are three views: Geo Map, Relation Graph and Scatter Plot.
+## When no country selected
+<img src="image/0.png" width="1000">
 
-## Exploration Mode
-<img src="image/exploration.png" width="1000">
-In this mode, users can dive into the trading details of the selected country. There are three views: Geo Map, Tree Map and Stacked Stream Graph.
+## When one country selected and toggled to export
+<img src="image/1.png" width="1000">
 
-## Functionalities
+## When 5 countries randomly selected and toggled to import 
+<img src="image/2.png" width="1000">
 
+## Views
 ### Relation Graph
 * drag the Year slider will change the data that powers three views
 * drag the Max Number of Nodes will adjusts the number of nodes displayed in the relation graph
@@ -22,17 +20,18 @@ In this mode, users can dive into the trading details of the selected country. T
 * hover over the edge will highlight the two bonding countries, and show a tooltip
 * click on node will highlight its edges.
 
-### Scatter Plot
-* hover over the mark will show a tooltip, and highlight all other marks belongs to the same country.
-
 ### Geo Map
 * hover over a countries will show a tooltip
 
 ### Tree Map
 * hover over a product category will show a tooltip
 
-### Widget
+## Widget
 * switch the Export/Import toggle will change all the values of three views to the corresponding type.
 * check single country will show the treemap
 * check multiple countries will show the scatter plot
+
+<img src="image/search.png" width="300">
+
+## Credits
 
