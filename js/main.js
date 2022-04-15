@@ -2,7 +2,7 @@
 let countries = new Set();
 let countriesSelected = ['CAN'];
 let export_import = 'export';
-let selectedTime = 1995; 
+let selectedTime = 1995;
 let mode = 'overview'; // overview/ exploration;
 let id2name = {};
 let name2id = {};
@@ -37,8 +37,6 @@ Promise.all([
         'emoji': _data[6]
     }
 
-    console.log(data['emoji']);
-    console.log(data['countryMap']);
     data['emoji'].forEach(d => {
         data['countryMap'].forEach(c => {
             if (c.location_name_short_en.includes(d.country) || d.country.includes(c.location_name_short_en)) {
@@ -50,7 +48,7 @@ Promise.all([
     data['countryMap'].forEach(d => {
         id2name[d.location_code] = d.location_name_short_en;
         name2id[d.location_name_short_en] = d.location_code;
-        name2emoji[d.location_name_short_en] =  !(d.location_name_short_en in name2emoji)? '🏳️‍🌈' : name2emoji[d.location_name_short_en];
+        name2emoji[d.location_name_short_en] = !(d.location_name_short_en in name2emoji) ? '🏳️‍🌈' : name2emoji[d.location_name_short_en];
     });
 
     timeFilteredData = data["rollupForceData"][selectedTime];
@@ -96,7 +94,7 @@ function initViews() {
 
     // add button listeners
     document.getElementsByClassName("btn-group ")[0].addEventListener('click', (e) => {
-        export_import = e.target.innerText.toLowerCase(); 
+        export_import = e.target.innerText.toLowerCase();
         relationNodeFocus();
         updateGeomap();
         determineMode();
@@ -122,53 +120,46 @@ function initViews() {
         .attr('transform', `translate(30, 15)`)
         .call(yearSlider);
 
-    document.getElementById("search-county-input")
-        .addEventListener('keyup', (e) => {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                selectCountry(e);
-            } else {
-                showResults(e.target.value);
-            }
-    });
-    document.getElementById("search-county-input")
-        .addEventListener('change', (e) => {
-        selectCountry(e);
+    var countriesAutoComplete = Array.from(countries).map(d => {
+        return {label: id2name[d], value: d}
     });
 
-}
-
-function selectCountry(e) {
-    let cname = name2id[e.target.value]
-    if (cname) {
-        if (!countriesSelected.includes(cname)) {
-            countriesSelected.push(cname);
-            dispatcher.call("updateCountry", e, countriesSelected);
-        }
-        document.getElementById("result").innerHTML= "";
-        document.getElementById("search-county-input").value = "";
-    }
-}
-function autocompleteMatch(input) {
-    if (input == '') {
-        return [];
-    }
-    var reg = new RegExp(input)
-    return Array.from(countries).map(d => id2name[d]).filter(function(term) {
-        if (term.match(reg)) {
-            return term;
+    autocomplete({
+        input: document.getElementById("search-county-input"),
+        minLength:1,
+        emptyMsg: 'No countries found',
+        render: function(item, currentValue) {
+            var div = document.createElement("div");
+            div.textContent = name2emoji[item.label] + "  " + item.label;
+            return div;
+        },
+        fetch: function (text, update) {
+            text = text.toLowerCase();
+            var suggestions = countriesAutoComplete.filter(n => n.label.toLowerCase().startsWith(text))
+            update(suggestions);
+        },
+        onSelect: function (item) {
+            input.value = item.label;
+            selectCountry(item.value);
+            input.value = "";
+        },
+        onEnter: function (item) {
+            input.value = item.label;
+            selectCountry(item.value);
+            input.value = "";
         }
     });
+
 }
 
-function showResults(val) {
-    res = document.getElementById("result");
-    res.innerHTML = '';
-    let list = '';
-    let terms = autocompleteMatch(val);
-    for (i=0; i<terms.length; i++) {
-        list += `<li> ${terms[i]}</li>`;
+function selectCountry(cname) {
+    if (cname && !countriesSelected.includes(cname)) {
+        countriesSelected.push(cname);
+        updateDisplayedCountries();
+        relationNodeFocus();
+        updateGeomap();
+        determineMode()
     }
-    res.innerHTML = '<ul>' + list + '</ul>';
 }
 
 function initDispatchers() {
@@ -192,8 +183,8 @@ function initDispatchers() {
         determineMode();
     })
 
-    dispatcher.on('updateRelationBarChart', d=> {
-        barChart.data = export_import === "export"? Object.entries(d.export):Object.entries(d.import);
+    dispatcher.on('updateRelationBarChart', d => {
+        barChart.data = export_import === "export" ? Object.entries(d.export) : Object.entries(d.import);
         barChart.updateVis();
     })
 }
@@ -207,9 +198,13 @@ function updateDisplayedCountries() {
             for (const input of inputs) {
                 input.addEventListener('click', (event) => {
                     const elem = event.currentTarget;
-                    const templabel =  elem.parentNode.outerText;
+                    const templabel = elem.parentNode.outerText;
                     let id;
-                    timeFilteredData['node'].forEach(d => {if (templabel.includes(id2name[d.id])){id= d.id}});
+                    timeFilteredData['node'].forEach(d => {
+                        if (templabel.includes(id2name[d.id])) {
+                            id = d.id
+                        }
+                    });
                     console.log(id);
                     if (elem.checked) {
                         countriesSelected.push(id);
@@ -260,12 +255,15 @@ async function updateCountryCheckbox() {
         var countryHTML = "";
         var checked = "";
         Array.from(countryNames).sort().forEach(val => {
-            if(countriesSelected.includes(name2id[val])) {checked = "checked";
-            } else {checked = "";}
+            if (countriesSelected.includes(name2id[val])) {
+                checked = "checked";
+            } else {
+                checked = "";
+            }
             countryHTML += `
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" `+ checked +`> 
-            <label class="form-check-label" for="flexCheckDefault">`  + val  + ` ` + name2emoji[val] + `</label>
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" ` + checked + `> 
+            <label class="form-check-label" for="flexCheckDefault">${name2emoji[val]} ${val}</label>
         </div>
     `
         });
@@ -282,7 +280,7 @@ function checkAll() {
     sel.property('checked', false);
     countriesSelected = [];
     var randomIndexes = [];
-    while(randomIndexes.length < 5 || randomIndexes.length == sel._groups[0].length){
+    while (randomIndexes.length < 5 || randomIndexes.length == sel._groups[0].length) {
         const randomIndex = Math.floor(Math.random() * sel._groups[0].length);
         if (!randomIndexes.includes(randomIndex)) randomIndexes.push(randomIndex);
     }
@@ -290,7 +288,11 @@ function checkAll() {
         sel._groups[0][d].checked = true;
         const tempLabel = sel._groups[0][d].parentElement.outerText;
         let id;
-        timeFilteredData['node'].forEach(d => {if (tempLabel.includes(id2name[d.id])){id = d.id}});
+        timeFilteredData['node'].forEach(d => {
+            if (tempLabel.includes(id2name[d.id])) {
+                id = d.id
+            }
+        });
         countriesSelected.push(id);
     });
     relationNodeFocus();
@@ -308,8 +310,8 @@ function uncheckAll() {
     determineMode();
 }
 
-function determineMode(){
-    if(countriesSelected.length <= 1) {
+function determineMode() {
+    if (countriesSelected.length <= 1) {
         // exploration mode
         d3.select("#scatter").html("");
         treemap = new TreeMap({
@@ -317,7 +319,7 @@ function determineMode(){
             containerWidth: 64 * vw,
             containerHeight: 36 * vh,
         }, data["mergedRawData"]);
-    } else if(countriesSelected.length > 1) {
+    } else if (countriesSelected.length > 1) {
         // overview mode
         d3.select("#scatter").html("");
         treeMapBarChart = new TreeMapBarChart({
