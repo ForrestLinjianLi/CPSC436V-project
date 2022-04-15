@@ -78,14 +78,14 @@ function initViews() {
     // Relation graph
     overview = new OverviewGraph({
         parentElement: '#overview',
-        containerWidth: 28 * vw,
+        containerWidth: 30.5 * vw,
         containerHeight: 38 * vh,
     }, timeFilteredData, barChart, dispatcher);
 
     // Geomap
     geomap = new ChoroplethMap({
         parentElement: '#geomap',
-        containerWidth: 28 * vw,
+        containerWidth: 30.5 * vw,
         containerHeight: 44 * vh,
     }, data["world"], timeFilteredData, export_import, countriesSelected, dispatcher);
 
